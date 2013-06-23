@@ -1,0 +1,36 @@
+=pod
+
+=head1 NAME
+
+lorem - A tool to identify switch events
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tempus nisl nunc, nec pulvinar magna condimentum non. Cras convallis dictum nisl, et facilisis lectus euismod id.
+
+=head1 VERSION
+
+lorem 1.0
+
+=head1 SYNOPSIS
+
+lorem [options]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help> | B<-h>
+
+Print the documentation.
+
+=item B<** REQUIRED **>
+
+=item B<--tool> | B<-t> <get_data|get_switch>
+
+Tool to be executed. More information about a specific tool can be obtained
+in its help page:
+
+lorem -t get_data -h
+
+=back
+
+=cut

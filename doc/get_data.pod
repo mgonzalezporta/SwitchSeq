@@ -1,0 +1,35 @@
+=pod
+
+=head1 SYNOPSIS
+
+lorem -t get_data [options]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help> | B<-h>
+
+Print the documentation.
+
+=item B<** REQUIRED **>
+
+=item B<--species> | B<-s> <hsa|mmu>
+
+Species: human or mouse.
+
+=item B<--ensembl_v> | B<-e> <integer>
+
+Ensembl version.
+
+=item B<** OPTIONAL **>
+
+=item B<--data_dir> | B<-d> <dir>
+
+Temporary data directory. [default: ./data]
+
+
+
+=back
+
+=cut

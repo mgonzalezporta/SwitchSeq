@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<title>Switch events</title>
+	<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="./css/DT_bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="./css/TableTools.css">
+
+	<script type="text/javascript" language="javascript" src="./js/jquery.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/TableTools.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/bootstrap.min.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/DT_bootstrap.js"></script>
+	
+</head>
+<body>
+
+<div class="container">
+
+	<div class="accordion" id="accordion_options">
+		<div class="accordion-group">
+		    <div class="accordion-heading">
+		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#filter">
+		        <b>1. Filter</b>
+		      </a>
+		    </div>
+		    <div id="filter" class="accordion-body collapse">
+			    <div class="accordion-inner pagination-centered">
+
+					<p><b>Functional classification of switch events<br>
+						based on transcript biotype (C1, C2)</b></p>
+
+					<table class="table" id="toc">
+					<tbody>
+						<tr>
+							<td><b>All</></td>
+							<td></td>
+							<td><a href="index.html">{$count{'total'}}</a></td>
+						</tr>
+						<tr>
+							<td><b>Protein coding</b></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>protein coding</td>
+							<td>protein coding</td>
+							<td><a href="pc_to_pc.html">{$count{'pc_to_pc'}}</a></td>
+						</tr>
+
+						<tr>
+							<td><b>Potential function loss</b></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>protein coding</td>
+							<td>nonsense mediated decay</td>
+							<td><a href="pc_to_nmd.html">{$count{'pc_to_nmd'}}</a></td>
+						</tr>
+						<tr>
+							<td>protein coding</td>
+							<td>retained intron</td>
+							<td><a href="pc_to_ri.html">{$count{'pc_to_ri'}}</a></td>
+						</tr>
+						<tr>
+							<td>protein coding</td>
+							<td>processed transcript</td>
+							<td><a href="pc_to_pt.html">{$count{'pc_to_pt'}}</a></td>
+						</tr>
+
+						<tr>
+							<td><b>Potential function gain</b></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>nonsense mediated decay</td>
+							<td>protein coding</td>
+							<td><a href="nmd_to_pc.html">{$count{'nmd_to_pc'}}</a></td>
+						</tr>
+						<tr>
+							<td>retained intron</td>
+							<td>protein coding</td>
+							<td><a href="ri_to_pc.html">{$count{'ri_to_pc'}}</a></td>
+						</tr>
+							<tr><td>processed transcript</td>
+							<td>protein coding</td>
+							<td><a href="pt_to_pc.html">{$count{'pt_to_pc'}}</a></td>
+						</tr>
+						<tr>
+							<td><b>Other</b></td>
+							<td></td>
+							<td><a href="other.html">{$count{'other'}}</a>
+							</td>
+						</tr>
+					</tbody>
+					</table>
+				</div>
+		    </div>
+		</div>
+
+	  	<div class="accordion-group">
+			<div class="accordion-heading">
+			  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#format">
+			    <b>2. Format</b>
+			  </a>
+			</div>
+		    <div id="format" class="accordion-body collapse">
+			    <div class="accordion-inner">
+				{
+					for my $i ( 0 .. $#colnames ) {
+						my @row = split(/:/, $colnames[$i]);
+						$row[1] =~ s/_/ /g;
+						$OUT .= "<a href=\"javascript:void(0);\" onclick=\"fnShowHide($i);\"><input type=\"checkbox\" checked /></a> <b>$row[0]</b>: $row[1]<br>\n\t\t\t\t";
+					} 
+				}
+			    </div>
+		    </div>
+	  	</div>
+	</div>
+
+</div>
+
+<div class="table" id="big_container">
+	<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="main">
+	<thead>
+	  	<tr>
+	  		{
+				for my $i ( 0 .. $#colnames ) {
+					my @row = split(/:/, $colnames[$i]);
+					$OUT .= "<th>$row[0]</th>\n";
+				}
+			} 
+		</tr>
+	</thead>
+	<tbody>
+		{
+	  		for my $i ( 0 .. $#query ) {
+		  		$OUT .= "<tr>\n";
+		  		
+		  		my $gId=$query[$i][0];
+
+		        for my $j ( 0 .. $#{$query[$i]} ) {
+		       		my $content=$query[$i][$j];
+		       		if ($j==0) {
+		       			my $url="http://www.ensembl.org/Homo_sapiens/Gene/Summary?g=$gId";
+		       			# my $url="http://feb2012.archive.ensembl.org/Homo_sapiens/Gene/Summary?g=$gId";
+		            	$OUT .= "\t<td><a href=$url>$gId</a></td>\n";
+	            	} elsif ($j==4 || $j==10) {
+	            		my $tId=$query[$i][$j-1];
+	            		my $url="http://appris.bioinfo.cnio.es/report.html?id=$tId&namespace=Ensembl_Transcript_Id";
+	            		$OUT .= "\t<td><a href=$url>$content</a></td>\n";
+	            	} elsif ($j==17 and $content ne "NA") {
+	            		my $pdbId=$content;
+	            		my $url="http://www.rcsb.org/pdb/explore/explore.do?structureId=$pdbId";
+	            		$OUT .= "\t<td><a href=$url>$pdbId</a></td>\n";
+	            	} else {
+	            		$OUT .= "\t<td>$content</td>\n";
+	            	}
+		        }
+
+			   	my $plot_dir="./plots";
+			   	my $subDir=substr($gId, 0, 12);
+			    # boxplot
+		  		my $url_boxplot="$plot_dir/boxplots/$subDir/$gId-rotated90.pdf";
+				$OUT .= "<td><a href=$url_boxplot>boxplot</a></td>";
+			
+				# starplot
+				my $url_starplot="$plot_dir/stars/$subDir/$gId.pdf";
+				$OUT .= "<td><a href=$url_starplot>starplot</a></td>";		        
+		    	$OUT .= "</tr>\n";
+		    }
+		}
+	</tbody>
+	</table>
+</div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+
+# lorem --get-data -e 70 -s hsa
+# lorem --input --cond1 --cond2 -e 70 -s hsa
+
+# --input --cond1 --cond2
+# # only required in exec mode
+
+# lorem get_data -e 70 -s hsa 
+# 	# also -h -d
+# lorem get_switch --input --cond1 --cond2 -e 70 -s hsa
+# 	# all options
+
+################################################
+my $help=0;
+my $tool="";
+
+my ($species, $ensembl_v);
+my $data_dir="../data";
+
+my ($input, $cond1, $cond2);
+my $out_dir="../html";
+my $threshold_gexp=0.01;
+my $plot="starplots";
+
+GetOptions(
+        'help|h'				=> \$help,
+        'tool|t=s'				=> \$tool,
+
+        'data_dir|d:s'			=> \$data_dir,
+        'species|s:s'			=> \$species,
+        'ensembl_v|e:i'			=> \$ensembl_v,
+
+        'input|i=s'				=> \$input,
+        'out_dir|o=s'			=> \$out_dir,
+        'cond1|c1=s'			=> \$cond1,
+        'cond2|c2=s'			=> \$cond2,
+        'threshold_gexp|g=f'	=> \$threshold_gexp,
+        'plot|p=s'				=> \$plot
+) or die pod2usage(
+	-input => "./doc/lorem.pod",
+	-verbose => 1
+);
+
+# process options
+if ($tool eq "get_data") {
+
+	if ($help or !defined($species) or 
+		!defined($ensembl_v)) {
+
+		die pod2usage(
+			-input => "./doc/get_data.pod",
+			-verbose => 1
+		);
+	}
+
+	unless ($species eq "hsa") {
+		die "Invalid --plot option\nPrint help: lorem -tool get_switch -h\n";
+	}
+
+	##
+
+	unless ( -e "$data_dir" ) { system("mkdir $data_dir") };
+	unless ( -e "$data_dir/$species" ) { system("mkdir $data_dir/$species") };
+	system("perl ./src/get_data.pl -d $data_dir -s $species -e $ensembl_v");
+
+} elsif ($tool eq "get_switch") {
+
+	if ($help or !defined($species) or 
+		!defined($ensembl_v) or
+		!defined($input) or
+		!defined($cond1) or 
+		!defined($cond2)) {
+
+		die pod2usage(
+			-input => "./doc/get_switch.pod",
+			-verbose => 1
+		);	
+	}
+
+	unless ($species eq "hsa") {
+		die "Invalid --plot option\nPrint help: lorem -tool get_switch -h\n";
+	}
+
+	unless (-e $input) {
+		die("Cannot open $input: $!\n");
+	}
+
+	my @cond1=split("-", $cond1);
+	my @cond2=split("-", $cond2);
+	unless ($cond1 =~ /\d+-\d+/ and $cond2 =~ /\d+-\d+/
+		and $cond1[0]<=$cond1[1] and $cond2[0]<=$cond2[1]) {
+		die "Wrong format for column intervals\nPrint help: lorem -tool get_switch -h\n";
+	}
+	unless ($cond1[0]>2) {
+		die "Invalid interval for --cond1: the first two columns must contain gene and transcript ids\nPrint help: lorem -tool get_switch -h\n";
+	}
+	unless ($cond1[1]+1==$cond2[0]) {
+		warn "Warning: Missing columns in the interval definitions\n";
+	}
+
+	unless ($plot eq "starplots" or $plot eq "boxplots" or $plot eq "both") {
+		die "Invalid --plot option\nPrint help: lorem -h\n";
+	}
+
+	unless ( -e "$data_dir" and -e "$data_dir/$species" ) { 
+		die "Cannot find data directory $data_dir\nObtain data first: lorem -t get_data -h\n";
+	}
+
+	##
+
+	unless ( -e "$data_dir" ) { system("mkdir $data_dir") };
+	
+	unless (-e $out_dir) { mkdir $out_dir };
+	system("perl ./src/get_switch.pl -d $data_dir -s $species -e $ensembl_v -i $input -o $out_dir -c1 $cond1 -c2 $cond2 -g $threshold_gexp -p $plot");
+} elsif ($help) {
+	# print doc - long version
+	die pod2usage(
+		-input => "./doc/lorem.pod",
+		-verbose => 99,
+	    -sections => "NAME|VERSION|SYNOPSIS|OPTIONS" );
+} else {
+	# print doc - short version
+	die pod2usage(
+		-input => "./doc/lorem.pod",
+		-verbose => 1
+	);
+}
