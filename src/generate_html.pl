@@ -13,10 +13,16 @@ use Data::Dumper;
 # R args
 ##############################################################
 
-my ($out_dir, $plot);
+my ($input, $data_dir, $out_dir, $cond1, $cond2, $species, $ensembl_v, $plot);
 
 GetOptions(
+		'input|i=s'				=> \$input,
+		'data_dir|d=s'			=> \$data_dir,
         'out_dir|o=s'			=> \$out_dir,
+        'cond1|c1=s'			=> \$cond1,
+        'cond2|c2=s'			=> \$cond2,
+        'species|s=s'			=> \$species,
+        'ensembl_v|e:i'			=> \$ensembl_v,
         'plot|p=s'				=> \$plot
 );
 
@@ -36,13 +42,19 @@ while( my $row = <INPUT>)  {
     if ($.==1) {
     	# Header
     	$data{'header'} = \@row;
-		push @{ $data{"header"} }, "boxplot:link_to_boxplot", "starplot:link_to_starplot";
+    	if ($plot eq 'starplots') {
+			push @{ $data{"header"} }, "starplot:link_to_starplot";
+		} elsif ($plot eq 'boxplots') {
+			push @{ $data{"header"} }, "boxplot:link_to_boxplot";
+		} elsif ($plot eq 'both') {
+			push @{ $data{"header"} }, "boxplot:link_to_boxplot", "starplot:link_to_starplot";
+		}
     } else {
     	$total++;
 
     	# Generate plots
     	my $gId=$row[0];
-    	my $command="Rscript ./src/plots.R $gId ./tExp.fpkms";	# suppress output
+    	my $command="Rscript ./src/plots.R $plot $input $out_dir $data_dir $species $ensembl_v $cond1 $cond2 $gId";
     	#system($command);
 
     	# Classify switch events based on transcript biotype info
@@ -117,6 +129,9 @@ my %to_template = (
 	query => \@all,
 	);
 
+print Dumper $data{"header"};
+#print Dumper @all;
+
 my $result = $template->fill_in(HASH => \%to_template);
 my $outfile="$out_dir/index.html";
 open (OUT, ">$outfile");
@@ -125,5 +140,5 @@ if (defined $result) { print OUT $result }
 close (OUT);
 
 # copy css + js
-system("cp -R ./test_23/css $out_dir");
-system("cp -R ./test_23/js $out_dir");
+system("cp -R $data_dir/css $out_dir");
+system("cp -R $data_dir/js $out_dir");

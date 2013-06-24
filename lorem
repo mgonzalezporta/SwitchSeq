@@ -84,9 +84,9 @@ if ($tool eq "get_data") {
 		);	
 	}
 
-	unless ($species eq "hsa") {
-		die "Invalid --plot option\nPrint help: lorem -tool get_switch -h\n";
-	}
+	# unless ($species eq "hsa") {
+	# 	die "Invalid --plot option\nPrint help: lorem -tool get_switch -h\n";
+	# }
 
 	unless (-e $input) {
 		die("Cannot open $input: $!\n");

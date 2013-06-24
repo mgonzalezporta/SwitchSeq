@@ -25,7 +25,7 @@ GetOptions(
 # GET FILES
 print "# Obtaining the necessary files\n";
 
-# # data
+# data
 # my $ensembl_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/$species/_ensembl$ensembl_v.annot_coding.txt";
 # &get_file($ensembl_url, "$data_dir/$species");
 
@@ -38,12 +38,12 @@ print "# Obtaining the necessary files\n";
 # my $pdb_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/$species/_UniPdbCov.txt";
 # &get_file($pdb_url, "$data_dir/$species");
 
-# # css + js
-# my $css_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/css.tar.gz";
-# &get_file($css_url, $data_dir);
+# css + js
+my $css_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/css.tar.gz";
+&get_file($css_url, $data_dir);
 
-# my $js_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/js.tar.gz";
-# &get_file($js_url, $data_dir);
+my $js_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/js.tar.gz";
+&get_file($js_url, $data_dir);
 
 ##############################################################
 

@@ -1,4 +1,4 @@
-plot_stars=function(gId, x) {
+plot_stars=function(gId, x, cond1, cond2, outfile) {
 	# data normalisation
 	for (i in 1:dim(x)[2]) {
 		x[,i]=x[,i]*abs(sqrt(gexp/max(gexp)))
@@ -31,15 +31,7 @@ plot_stars=function(gId, x) {
 	        col=c(col, rainbow( n, s = 0.7, v = 0.8, alpha=0.7, start=start ,end=end))
 	}
 	
-	# optimise output dir structure
-	setwd("./html_23/plots/stars")
-	subDir=paste(unlist(strsplit(gId, ''))[c(1:12)], collapse='')
-	dir.create(file.path('./', subDir), showWarnings = FALSE)
-	outfile=paste(subDir, "/", gId, ".pdf", sep="")
-
 	# plot layout
-	cond1=1:3	##
-	cond2=4:7	##
 	nrows_layout=max(length(cond1), length(cond2))
 
 	h=nrows_layout*.5

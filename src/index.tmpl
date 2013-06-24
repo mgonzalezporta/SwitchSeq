@@ -8,7 +8,7 @@
 
 	<script type="text/javascript" language="javascript" src="./js/jquery.js"></script>
 	<script type="text/javascript" language="javascript" src="./js/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" language="javascript" src="./js/TableTools.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/TableTools.min.js"></script>
 	<script type="text/javascript" language="javascript" src="./js/bootstrap.min.js"></script>
 	<script type="text/javascript" language="javascript" src="./js/DT_bootstrap.js"></script>
 	
@@ -139,6 +139,9 @@
 	  		for my $i ( 0 .. $#query ) {
 		  		$OUT .= "<tr>\n";
 		  		
+		  		# get relevant array indices by looking at header (grep or =~)
+		  		# if $i == relevant index...
+		  		
 		  		my $gId=$query[$i][0];
 
 		        for my $j ( 0 .. $#{$query[$i]} ) {
@@ -167,7 +170,7 @@
 				$OUT .= "<td><a href=$url_boxplot>boxplot</a></td>";
 			
 				# starplot
-				my $url_starplot="$plot_dir/stars/$subDir/$gId.pdf";
+				my $url_starplot="$plot_dir/starplots/$subDir/$gId.pdf";
 				$OUT .= "<td><a href=$url_starplot>starplot</a></td>";		        
 		    	$OUT .= "</tr>\n";
 		    }
