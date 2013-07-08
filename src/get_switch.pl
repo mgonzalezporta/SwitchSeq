@@ -7,6 +7,8 @@ use Bio::SeqIO;
 use List::Util qw[ max ];
 use Getopt::Long;
 use Data::Dumper;
+use lib './src/';
+use myFunctions;
 
 ##############################################################
 
@@ -19,12 +21,12 @@ GetOptions(
         'data_dir|d:s'			=> \$data_dir,
         'species|s:s'			=> \$species,
         'ensembl_v|e:i'			=> \$ensembl_v,
-        'input|i=s'			=> \$input,
+        'input|i=s'				=> \$input,
         'out_dir|o=s'			=> \$out_dir,
         'cond1|c1=s'			=> \$cond1,
         'cond2|c2=s'			=> \$cond2,
-        'threshold_gexp|g=f'	        => \$threshold_gexp,
-        'plot|p=s'			=> \$plot
+        'threshold_gexp|g=f'	=> \$threshold_gexp,
+        'plot|p=s'				=> \$plot
 );
 
 # adjust columns
@@ -263,7 +265,19 @@ foreach my $gId (keys %recurrent_tx) {
 close (OUT);
 
 # generate html
-system("perl ./src/generate_html.pl -i $input -d $data_dir -o $out_dir -c1 $cond1 -c2 cond2 -s $species -e $ensembl_v -p $plot");
+#require "./src/generate_html.pl";
+
+my %arguments=(
+	"input" 	=> 	$out_file,
+	"out_dir"	=> $out_dir,
+	"data_dir"	=> $data_dir,
+	"species"		=> $species,
+	"ensembl_v"	=> $ensembl_v,
+	"cond1"  		=> $cond1,
+	"cond2"  		=> $cond2
+);
+
+&generate_html(\%arguments);
 
 # ##############################################################
 

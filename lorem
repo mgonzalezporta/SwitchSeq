@@ -41,8 +41,8 @@ GetOptions(
         'out_dir|o=s'			=> \$out_dir,
         'cond1|c1=s'			=> \$cond1,
         'cond2|c2=s'			=> \$cond2,
-        'threshold_gexp|g=f'	=> \$threshold_gexp,
-        'plot|p=s'				=> \$plot
+        'threshold_gexp|g=f'	=> \$threshold_gexp
+        #'plot|p=s'				=> \$plot
 ) or die pod2usage(
 	-input => "./doc/lorem.pod",
 	-verbose => 1
