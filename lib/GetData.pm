@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use Exporter;
 use LWP::Simple;
-use Getopt::Long;
 use Data::Dumper;
 
 our @ISA= qw( Exporter );

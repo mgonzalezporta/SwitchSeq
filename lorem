@@ -6,30 +6,18 @@ use Getopt::Long;
 use Pod::Usage;
 use lib './lib/';
 use GetData;
+use GetSwitch;
 use Data::Dumper;
 
-# lorem --get-data -e 70 -s hsa
-# lorem --input --cond1 --cond2 -e 70 -s hsa
-
-# --input --cond1 --cond2
-# # only required in exec mode
-
-# lorem get_data -e 70 -s hsa 
-# 	# also -h -d
-# lorem get_switch --input --cond1 --cond2 -e 70 -s hsa
-# 	# all options
-
-################################################
+## get options
 my %arguments;
 
-## set defaults
 $arguments{'help'}=0;
 $arguments{'data_dir'}="../data";
 $arguments{'out_dir'}="../html";
 $arguments{'threshold_gexp'}=0.01;
 $arguments{'tool'}="";
 
-## get user options
 GetOptions(
 	\%arguments, 
 	'help|h',
@@ -49,10 +37,10 @@ GetOptions(
 
 ## process user options
 if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
-	## species and ensembl_v must be defined
-	if ($arguments{'help'} 
-		or !defined($arguments{'species'}) 
-		or !defined($arguments{'ensembl_v'})) {
+	## check for required arguments
+	if ($arguments{'help'} or
+		!defined($arguments{'species'}) or
+		!defined($arguments{'ensembl_v'})) {
 		
 		die pod2usage(
 			-input => "./doc/get_data.pod",
@@ -62,58 +50,69 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 
 	## only support hsa - temporary
 	unless ($arguments{'species'} eq "hsa") {
-		die "Sorry, only human supported for now.\nPrint help: lorem -tool get_data -h\n";
+		my $message="Sorry, only human supported for now.\n".
+					"Print help: lorem -tool get_data -h\n";
+		die $message;
 	}
 
 	## finally, get the data
 	&get_data(\%arguments);
 
 } elsif (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_switch") {
+	## check for required arguments
+	if ($arguments{'help'} or 
+		!defined($arguments{'species'}) or 
+		!defined($arguments{'ensembl_v'}) or
+		!defined($arguments{'input'}) or
+		!defined($arguments{'cond1'}) or 
+		!defined($arguments{'cond2'})) {
 
-# 	if ($help or !defined($species) or 
-# 		!defined($ensembl_v) or
-# 		!defined($input) or
-# 		!defined($cond1) or 
-# 		!defined($cond2)) {
+		die pod2usage(
+			-input => "./doc/get_switch.pod",
+			-verbose => 1
+		);	
+	}
 
-# 		die pod2usage(
-# 			-input => "./doc/get_switch.pod",
-# 			-verbose => 1
-# 		);	
-# 	}
+	## only support hsa - temporary
+	unless ($arguments{'species'} eq "hsa") {
+		my $message="Sorry, only human supported for now.\n".
+					"Print help: lorem -tool get_data -h\n";
+		die $message;
+	}
 
-# 	# unless ($species eq "hsa") {
-# 	# 	die "Invalid --plot option\nPrint help: lorem -tool get_switch -h\n";
-# 	# }
+	## check input arguments
+	unless (-e $arguments{'input'}) {
+		die("Cannot open $arguments{'input'}: $!\n");
+	}
 
-# 	unless (-e $input) {
-# 		die("Cannot open $input: $!\n");
-# 	}
+	my @cond1=split("-", $arguments{'cond1'});
+	my @cond2=split("-", $arguments{'cond2'});
+	unless ($arguments{'cond1'} =~ /\d+-\d+/ and 
+			$arguments{'cond2'} =~ /\d+-\d+/ and 
+			$cond1[0]<=$cond1[1] and 
+			$cond2[0]<=$cond2[1]) {
+				my $message="Wrong format for column intervals.\n".
+							"Print help: lorem -tool get_switch -h\n";
+				die $message;
+	}
+	unless ($cond1[0]>2) {
+		my $message="Invalid interval for --cond1: the first two columns must contain gene and transcript ids.\n".
+					"Print help: lorem -tool get_switch -h\n";
+		die $message;
+	}
+	unless ($cond1[1]+1==$cond2[0]) {
+		my $message="Warning: Inconsistency detected in the column interval definitions.\n".
+					"         Please check --cond1 and --cond2.\n";
+		warn $message;
+	}
 
-# 	my @cond1=split("-", $cond1);
-# 	my @cond2=split("-", $cond2);
-# 	unless ($cond1 =~ /\d+-\d+/ and $cond2 =~ /\d+-\d+/
-# 		and $cond1[0]<=$cond1[1] and $cond2[0]<=$cond2[1]) {
-# 		die "Wrong format for column intervals\nPrint help: lorem -tool get_switch -h\n";
-# 	}
-# 	unless ($cond1[0]>2) {
-# 		die "Invalid interval for --cond1: the first two columns must contain gene and transcript ids\nPrint help: lorem -tool get_switch -h\n";
-# 	}
-# 	unless ($cond1[1]+1==$cond2[0]) {
-# 		warn "Warning: Missing columns in the interval definitions\n";
-# 	}
-
-# 	unless ($plot eq "starplots" or $plot eq "boxplots" or $plot eq "both") {
-# 		die "Invalid --plot option\nPrint help: lorem -h\n";
-# 	}
-
-# 	unless ( -e "$data_dir" and -e "$data_dir/$species" ) { 
-# 		die "Cannot find data directory $data_dir\nObtain data first: lorem -t get_data -h\n";
-# 	}
-
-# 	##
-
-# 	unless ( -e "$data_dir" ) { system("mkdir $data_dir") };
+	unless ( -e $arguments{'data_dir'} and 
+			 -e "$arguments{'data_dir'}/$arguments{'species'}" ) {
+				my $message="Cannot find data directory:\n".
+							"   $arguments{'data_dir'}/$arguments{'species'}\n".
+							"Obtain data first: lorem -t get_data -h\n";
+				die $message;
+	}
 	
 # 	unless (-e $out_dir) { mkdir $out_dir };
 # 	system("perl ./src/get_switch.pl -d $data_dir -s $species -e $ensembl_v -i $input -o $out_dir -c1 $cond1 -c2 $cond2 -g $threshold_gexp -p $plot");

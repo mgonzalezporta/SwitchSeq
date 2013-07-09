@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-package myFunctions;
+package GetSwitch;
 use strict;
 use warnings;
 use Exporter;
@@ -8,7 +8,7 @@ use Text::Template;
 use Data::Dumper;
 
 our @ISA= qw( Exporter );
-our @EXPORT = qw( generate_html );
+our @EXPORT = qw( get_switch );
 
 sub generate_html {
 
