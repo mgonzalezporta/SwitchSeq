@@ -232,10 +232,16 @@ foreach my $gId (keys %recurrent_tx) {
 	           	my $outdir_aln="$out_dir/prot_aln/".substr($gId, 0, 12);
 	           	unless ( -e  "$out_dir/prot_aln/" ) { system("mkdir $out_dir/prot_aln/") };
 	           	unless ( -e  $outdir_aln ) { system("mkdir $outdir_aln") };
-	           	my $out_aln="$outdir_aln/$gId.needle.out";
+	           	my $out_aln="$outdir_aln/tmp.$gId.needle.out";
 				system("needle $fa_cond1 $fa_cond2 -auto stdout > $out_aln");
 	            $pIdentity=`cat $out_aln | grep Identity | awk -F '(' '{print \$2}' | awk -F '%' '{print \$1}' | sed 's/ //g'`;
 	            chomp $pIdentity;
+
+	            ## append maistas-formatted fa
+	            system("echo '\n# Input for MAISTAS\n# (http://maistas.bioinformatica.crs4.it/)\n' >> $out_aln");
+	            my $out="$outdir_aln/$gId.needle_mod.out";
+	            system("cat $out_aln $fa_cond1 $fa_cond2 > $out");
+	            system("rm $out_aln");
 
 	            # pdb structure
 	            if ($species eq 'hsa' and defined $pdb{$gId}) {

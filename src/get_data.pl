@@ -8,9 +8,6 @@ use Getopt::Long;
 
 ##############################################################
 
-# add TableTools.min.js instead of TableTools.js
-# add TableTools.css
-
 # OPTIONS
 my ($data_dir, $species, $ensembl_v);
 
@@ -39,11 +36,11 @@ print "# Obtaining the necessary files\n";
 # &get_file($pdb_url, "$data_dir/$species");
 
 # css + js
-my $css_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/css.tar.gz";
-&get_file($css_url, $data_dir);
+# my $css_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/css.tar.gz";
+# &get_file($css_url, $data_dir);
 
-my $js_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/js.tar.gz";
-&get_file($js_url, $data_dir);
+# my $js_url="http://www.ebi.ac.uk/~mar/tools/lorem/data/js.tar.gz";
+# &get_file($js_url, $data_dir);
 
 ##############################################################
 
