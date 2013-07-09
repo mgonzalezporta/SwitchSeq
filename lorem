@@ -114,8 +114,8 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 				die $message;
 	}
 	
-# 	unless (-e $out_dir) { mkdir $out_dir };
-# 	system("perl ./src/get_switch.pl -d $data_dir -s $species -e $ensembl_v -i $input -o $out_dir -c1 $cond1 -c2 $cond2 -g $threshold_gexp -p $plot");
+	## finally, find switch events
+	get_switch(\%arguments);
 
 } elsif ($arguments{'help'}) {
 	## print doc - long version
