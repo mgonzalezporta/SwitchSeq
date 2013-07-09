@@ -144,7 +144,7 @@
 						for my $i ( 0 .. $#colnames ) {
 							my @row = split(/:/, $colnames[$i]);
 							$row[1] =~ s/_/ /g;
-							$OUT .= "<p><a href=\"javascript:void(0);\" onclick=\"fnShowHide($i);\"><input type=\"checkbox\" checked /></a> <b>$row[0]</b>: $row[1]<br></p>";
+							$OUT .= "<a href=\"javascript:void(0);\" onclick=\"fnShowHide($i);\"><input type=\"checkbox\" checked /></a> <b>$row[0]</b>: $row[1]<br>";
 						} 
 					}
 				    </div>
@@ -174,9 +174,11 @@
 			  		my $gId_index=$colnames_index{'gId'};
 			  		my $appris_index_c1=$colnames_index{'C1.principal'};
 			  		my $appris_index_c2=$colnames_index{'C2.principal'};
+			  		my $pIdentity_index=$colnames_index{'pIdentity'};
 			  		my $uniprot_index=$colnames_index{'pdbId'};		## fix this - only 1 column
 
 			  		my $gId=$query[$i][$gId_index];
+			  		my $subDir=substr($gId, 0, 12);
 
 			        for my $j ( 0 .. $#{$query[$i]} ) {
 			       		my $content=$query[$i][$j];
@@ -190,6 +192,10 @@
 		            		my $url="http://appris.bioinfo.cnio.es/report.html?id=$tId&namespace=Ensembl_Transcript_Id";
 		            		$OUT .= "\t<td><a href=$url>$content</a></td>\n";
 
+	            		} elsif ($j==$pIdentity_index and $content ne "NA") {
+	            			my $url="$info{'out_dir'}/prot_aln/$subDir/$gId.needle.out";
+	            			$OUT .= "<td><a href=$url>$content</a></td>";
+
 		            	} elsif ($j==$uniprot_index and $content ne "NA") {
 		            		my $uniprotId=$content;
 		            		my $url="http://www.ebi.ac.uk/pdbe/widgets/unipdb?uniprot=$uniprotId";
@@ -201,7 +207,6 @@
 			        }
 
 				   	my $plot_dir="./plots";
-				   	my $subDir=substr($gId, 0, 12);
 				    
 			  		my $url_boxplot="$plot_dir/boxplots/$subDir/$gId-rotated90.pdf";
 					$OUT .= "<td><a href=$url_boxplot>boxplot</a></td>";

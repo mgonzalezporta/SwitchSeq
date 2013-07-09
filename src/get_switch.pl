@@ -184,7 +184,7 @@ print OUT "C2.tExp:in_how_many_samples_is_the_transcript_detected_as_major?_-_co
 print OUT "C2.gExp:in_how_many_samples_is_the_gene_expressed?_-_condition_2 ";
 print OUT "C2.breadth:major_transcript_expression_breadth_-_condition_2 ";
 #"DE:is_the_gene_differentially_expressed?",
-print OUT "pSimilarity:similarity_between_the_two_coding_sequences ";
+print OUT "pIdentity:identity_between_the_two_coding_sequences ";
 print OUT "pdbEntry:is_there_a_PDB_entry_available? "
         if ($species eq 'hsa');
 print OUT "pdbId:PDB_id "
@@ -219,11 +219,11 @@ foreach my $gId (keys %recurrent_tx) {
 	        my ($isPrincipal_cond1, $tBiotype_cond1)=&get_transcript_info($gId, $tId_cond1);
 	        my ($isPrincipal_cond2, $tBiotype_cond2)=&get_transcript_info($gId, $tId_cond2);
 
-	 	# Annotate switch events - general info: pIdentity + pdb info
-                my $pIdentity="NA";
+	 		# Annotate switch events - general info: pIdentity + pdb info
+            my $pIdentity="NA";
         	my $pdbEntry="NA";
-                my $pdbId="NA";
-                my $pdbCoverage="NA";	 
+            my $pdbId="NA";
+            my $pdbCoverage="NA";	 
 	        if ($tBiotype_cond1 eq "protein_coding" and $tBiotype_cond2 eq "protein_coding") {
 
 	            # pIdentity
@@ -234,7 +234,8 @@ foreach my $gId (keys %recurrent_tx) {
 	           	unless ( -e  $outdir_aln ) { system("mkdir $outdir_aln") };
 	           	my $out_aln="$outdir_aln/$gId.needle.out";
 				system("needle $fa_cond1 $fa_cond2 -auto stdout > $out_aln");
-	            my $pIdentity=`cat $out_aln | grep Identity | awk -F '(' '{print \$2}' | awk -F '%' '{print \$1}' | sed 's/ //g'`;
+	            $pIdentity=`cat $out_aln | grep Identity | awk -F '(' '{print \$2}' | awk -F '%' '{print \$1}' | sed 's/ //g'`;
+	            chomp $pIdentity;
 
 	            # pdb structure
 	            if ($species eq 'hsa' and defined $pdb{$gId}) {
