@@ -21,11 +21,11 @@ sub get_data {
 
 	## define urls
 	my %url=(
-		ensembl 	=> "http://www.ebi.ac.uk/~mar/tools/lorem/data/$species/_ensembl$ensembl_v.annot_coding.txt",
-		prot_seq    => "http://www.ebi.ac.uk/~mar/tools/lorem/data/$species/_ensembl$ensembl_v.prot_seq.tar.gz",
-		appris      => "http://www.ebi.ac.uk/~mar/tools/lorem/data/$species/_appris.results.rel15.2May2013.v1.main.tsv",
-		css         => "http://www.ebi.ac.uk/~mar/tools/lorem/data/css.tar.gz",
-		js          => "http://www.ebi.ac.uk/~mar/tools/lorem/data/js.tar.gz"
+		ensembl 	=> "http://www.ebi.ac.uk/~mar/tools/lorem/$species/_ensembl$ensembl_v.annot_coding.txt",
+		prot_seq    => "http://www.ebi.ac.uk/~mar/tools/lorem/$species/_ensembl$ensembl_v.prot_seq.tar.gz",
+		appris      => "http://www.ebi.ac.uk/~mar/tools/lorem/$species/_appris.results.rel15.9Jun2013.v2.main.tsv",
+		css         => "http://www.ebi.ac.uk/~mar/tools/lorem/css.tar.gz",
+		js          => "http://www.ebi.ac.uk/~mar/tools/lorem/js.tar.gz"
 	);
 
 	## create directory structure
