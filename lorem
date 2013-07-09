@@ -56,7 +56,7 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 	}
 
 	## finally, get the data
-	&get_data(\%arguments);
+	get_data(\%arguments);
 
 } elsif (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_switch") {
 	## check for required arguments

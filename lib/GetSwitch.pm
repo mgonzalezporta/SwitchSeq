@@ -4,11 +4,17 @@ package GetSwitch;
 use strict;
 use warnings;
 use Exporter;
-use Text::Template;
-use Data::Dumper;
+#use Text::Template;
+use Bio::EnsEMBL::Registry;
+use Bio::SeqIO;
+use List::Util qw[ max ];
 
 our @ISA= qw( Exporter );
 our @EXPORT = qw( get_switch );
+
+sub get_switch {
+
+}
 
 sub generate_html {
 

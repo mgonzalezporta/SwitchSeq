@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use Exporter;
 use LWP::Simple;
-use Data::Dumper;
 
 our @ISA= qw( Exporter );
 our @EXPORT = qw( get_data );
@@ -33,11 +32,11 @@ sub get_data {
 	
 	## download files
 	print "# Obtaining the necessary files...\n";
-	&_get_file($url{'ensembl'}, "$data_dir/$species");
-	&_get_file($url{'prot_seq'}, "$data_dir/$species");
-	&_get_file($url{'appris'}, "$data_dir/$species");
-	&_get_file($url{'css'}, $data_dir);
-	&_get_file($url{'js'}, $data_dir);
+	_get_file($url{'ensembl'}, "$data_dir/$species");
+	_get_file($url{'prot_seq'}, "$data_dir/$species");
+	_get_file($url{'appris'}, "$data_dir/$species");
+	_get_file($url{'css'}, $data_dir);
+	_get_file($url{'js'}, $data_dir);
 	print "# Data files saved under $data_dir\n";
 }
 
