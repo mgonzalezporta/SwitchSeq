@@ -175,7 +175,7 @@
 			  		my $appris_index_c1=$colnames_index{'C1.principal'};
 			  		my $appris_index_c2=$colnames_index{'C2.principal'};
 			  		my $pIdentity_index=$colnames_index{'pIdentity'};
-			  		my $uniprot_index=$colnames_index{'pdbId'};		## fix this - only 1 column
+			  		my $pdb_index=$colnames_index{'pdbEntry'};
 
 			  		my $gId=$query[$i][$gId_index];
 			  		my $subDir=substr($gId, 0, 12);
@@ -196,10 +196,10 @@
 	            			my $url="$info{'out_dir'}/prot_aln/$subDir/$gId.needle_mod.out";
 	            			$OUT .= "<td><a href=$url>$content</a></td>";
 
-		            	} elsif ($j==$uniprot_index and $content ne "NA") {
+		            	} elsif ($j==$pdb_index and $content ne "NO") {
 		            		my $uniprotId=$content;
 		            		my $url="http://www.ebi.ac.uk/pdbe/widgets/unipdb?uniprot=$uniprotId";
-		            		$OUT .= "\t<td><a href=$url>$uniprotId</a></td>\n";
+		            		$OUT .= "\t<td><a href=$url>YES</a></td>\n";
 
 		            	} else {
 		            		$OUT .= "\t<td>$content</td>\n";

@@ -4,10 +4,11 @@ package GetSwitch;
 use strict;
 use warnings;
 use Exporter;
-#use Text::Template;
 use Bio::EnsEMBL::Registry;
 use Bio::SeqIO;
 use List::Util qw[ max ];
+#use lib '/usr/local/ActivePerl-5.16/html/site/lib/';
+use Text::Template;
 use Data::Dumper;
 
 our @ISA= qw( Exporter );
@@ -28,7 +29,7 @@ sub get_switch {
 
 
 	## progress
-	print "# Obtaining and annotating splicing switch events...\n";
+	print "# Obtaining and annotating alternative splicing switch events...\n";
 
 	## calculations
 	my $ref_major_tx=_obtain_major_tx($arguments{'input'});
@@ -38,8 +39,13 @@ sub get_switch {
 	my $ref_switch=_obtain_switch_events($ref_major_tx, $ref_recurrent_major_tx, $ref_arguments);
 	#print Dumper %$ref_switch;
 
+	## print output
+	_print_txt($ref_switch, $ref_arguments);
+	_print_html($ref_arguments);
+
 	## progress
-	print "Switch events obtained for X protein coding genes\n";
+	my $count=keys %$ref_switch;
+	print "# Switch events obtained for $count protein coding genes.\n";
 
 }
 
@@ -179,18 +185,11 @@ sub _obtain_switch_events {
 	my $appris_input="$data_dir/$species/_appris.results.rel15.9Jun2013.v2.main.tsv";
 	my $ref_appris=_load_appris($appris_input);
 
-	## prepare output
-	open(my $fh, ">$output") or die "Could not open $output: $!";
-	_print_header($fh);
-
-	## find, annotate and report switch events
+	## find and annotate
 	my $ref_switch=_find_switch($ref_major_tx, $ref_recurrent_major_tx, $ref_arguments);
 	
 	$ref_switch=_annotate_switch($ref_switch, $ref_ensembl, $ref_appris, $ref_arguments);
 	return $ref_switch;
-
-	## close output
-	close($fh);
 }
 
 sub _load_ensembl {
@@ -373,7 +372,7 @@ sub _annotate_switch {
         $switch{$gId}{'C2.biotype'}=_get_tx_biotype( $gId, $switch{$gId}{'C2.tId'}, $ref_ensembl );
  		$switch{$gId}{'rank'}=_calculate_rank( $switch{$gId} );	 		
         $switch{$gId}{'pIdentity'}="NA";
-    	$switch{$gId}{'pdbEntry'}="NA";
+    	$switch{$gId}{'pdbEntry'}="NO";
 
         if ($switch{$gId}{'C1.biotype'} eq "protein_coding" and 
         	$switch{$gId}{'C2.biotype'} eq "protein_coding") {
@@ -410,7 +409,7 @@ sub _get_prot_identity {
    	unless ( -e  "$out_dir/prot_aln/" ) { system("mkdir $out_dir/prot_aln/") };
    	unless ( -e  $outdir_aln ) { system("mkdir $outdir_aln") };
    	my $out_aln="$outdir_aln/$gId.needle_mod.out";
-   	my $pIdentity;
+   	my $pIdentity="NA";
 
    	## run needle to get protein identity
 	open(PIPE, "needle $fa_cond1 $fa_cond2 -auto stdout |") or die "Cannot open needle output: $!";
@@ -430,7 +429,7 @@ sub _get_prot_identity {
 		}
 	}
 	
-	print OUT "\n# Input for MAISTAS\n# (http://maistas.bioinformatica.crs4.it/)\n";
+	print OUT "\n# Input for MAISTAS\n# http://maistas.bioinformatica.crs4.it/\n";
 
 	foreach my $row (@$ref_fa_cond1) {
 		print OUT $row;
@@ -495,11 +494,38 @@ sub _calculate_rank {
 	return($rank);
 }
 
-sub _generate_html {
+sub _print_txt {
+	my $ref_switch=$_[0];
+	my $ref_arguments=$_[1];
+
+	my %switch=%$ref_switch;
+	my %arguments=%$ref_arguments;
+	my $out_dir=$arguments{'out_dir'};
+	my $out_file="$out_dir/switch.txt";
+
+	## prepare output
+	open(my $fh, ">$out_file") or die "Could not open $out_file: $!";
+	_print_header($fh);
+
+	foreach my $gId (keys %switch) {
+		#print "$gId\n";
+		print $fh "$gId $switch{$gId}{'gName'} $switch{$gId}{'nOfT'} ";
+		print $fh "$switch{$gId}{'C1.tId'} $switch{$gId}{'C1.principal'} ";
+		print $fh "$switch{$gId}{'C1.biotype'} $switch{$gId}{'C1.tExp'} ";
+		print $fh "$switch{$gId}{'C1.gExp'} $switch{$gId}{'C1.breadth'} ";
+		print $fh "$switch{$gId}{'C2.tId'} $switch{$gId}{'C2.principal'} ";
+		print $fh "$switch{$gId}{'C2.biotype'} $switch{$gId}{'C2.tExp'} ";
+		print $fh "$switch{$gId}{'C2.gExp'} $switch{$gId}{'C2.breadth'} ";
+		print $fh "$switch{$gId}{'pIdentity'} $switch{$gId}{'pdbEntry'} ";
+		print $fh "$switch{$gId}{'rank'}\n";
+	}
+    close($fh);
+}
+
+sub _print_html {
 	## collect arguments
 	my $ref_arguments=$_[0];
 	my %arguments=%{$ref_arguments};
-	my $input=$arguments{'input'};
 	my $out_dir=$arguments{'out_dir'};
 	my $data_dir=$arguments{'data_dir'};
 	my $species=$arguments{'species'};
@@ -507,7 +533,7 @@ sub _generate_html {
 	my $cond1=$arguments{'cond1'};
 	my $cond2=$arguments{'cond2'};
 
-	## define extra variables
+	my $input="$out_dir/switch.txt";
 	my %data;
 	my %colnames_index;
 	my $total=0;
@@ -522,7 +548,6 @@ sub _generate_html {
 	    if ($.==1) {
 	    	$data{'header'} = \@row;
 			push @{ $data{"header"} }, "boxplot:link_to_boxplot", "starplot:link_to_starplot";
-
 
 			my $n=@{ $data{'header'} };
 			for (my $i=0; $i<$n; $i++) {
@@ -618,7 +643,7 @@ sub _fill_template {
 	my $ref_to_template=$_[0];
 	my $outfile=$_[1];
 
-	my $template = Text::Template->new(SOURCE => './src/index.tmpl')
+	my $template = Text::Template->new(SOURCE => './templates/index.tmpl')
 	 	or die "Couldn't construct template: $Text::Template::ERROR";
 	my $result = $template->fill_in(HASH => $ref_to_template);
 
