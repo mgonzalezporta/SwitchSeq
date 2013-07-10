@@ -36,7 +36,7 @@ sub get_switch {
 	my $ref_recurrent_major_tx=_obtain_recurrent_major_tx($ref_major_tx, $ref_arguments);
 	#print Dumper %$ref_recurrent_major_tx;
 	my $ref_switch=_obtain_switch_events($ref_major_tx, $ref_recurrent_major_tx, $ref_arguments);
-	print Dumper %$ref_switch;
+	#print Dumper %$ref_switch;
 
 	## progress
 	print "Switch events obtained for X protein coding genes\n";
@@ -171,8 +171,10 @@ sub _obtain_switch_events {
 	my $output="$out_dir/switch.txt";
 	
 	## load data
-	my $ensembl_input="$data_dir/$species/_ensembl$ensembl_v.annot_coding.txt";
-	my $ref_ensembl=_load_ensembl($ensembl_input);
+	my $ensembl_input="$data_dir/$species/_ensembl$ensembl_v.annot_coding.1.txt";
+	my $pdb_input="$data_dir/$species/_ensembl$ensembl_v.annot_coding.2.txt";
+	my $ref_ensembl=_load_ensembl($ensembl_input, $pdb_input);
+	#print Dumper %$ref_ensembl;
 
 	my $appris_input="$data_dir/$species/_appris.results.rel15.9Jun2013.v2.main.tsv";
 	my $ref_appris=_load_appris($appris_input);
@@ -193,6 +195,7 @@ sub _obtain_switch_events {
 
 sub _load_ensembl {
 	my $ensembl_input=$_[0];
+	my $pdb_input=$_[1];
 	
 	my %ensembl;
 
@@ -207,15 +210,24 @@ sub _load_ensembl {
 			my $nOfT=$row[2];
 			my $tId=$row[3];
 			my $tBiotype=$row[4];
-			my $pdbId=$row[5];
-			my $uniprotId=$row[6];
 
 			$ensembl{$gId}{'gName'}=$gName;
 			$ensembl{$gId}{'nOfT'}=$nOfT;
 			$ensembl{$gId}{'transcripts'}{$tId}=$tBiotype;
-			if (defined($pdbId)) {
-				$ensembl{$gId}{'uniprotId'}=$uniprotId;
-			}
+		}
+	}
+	close (INPUT);
+
+	open (INPUT, "<$pdb_input") or die "Could not open $pdb_input: $!";
+	while( my $row = <INPUT>)  {
+		chomp ($row);
+
+		if ($row =~ /^ENSG/) {
+			my @row=split(/\s+/, $row);
+			my $gId=$row[0];
+			my $uniprotId=$row[1];
+
+			$ensembl{$gId}{'uniprotId'}=$uniprotId;
 		}
 	}
 	close (INPUT);
@@ -363,42 +375,85 @@ sub _annotate_switch {
         $switch{$gId}{'pIdentity'}="NA";
     	$switch{$gId}{'pdbEntry'}="NA";
 
-    	print "$gId - 1: $switch{$gId}{'C1.tId'} - $switch{$gId}{'C1.biotype'}  2: $switch{$gId}{'C2.tId'} $switch{$gId}{'C2.biotype'}\n";
         if ($switch{$gId}{'C1.biotype'} eq "protein_coding" and 
         	$switch{$gId}{'C2.biotype'} eq "protein_coding") {
+	            ## pIdentity
+	            $switch{$gId}{'pIdentity'}=_get_prot_identity($ref_arguments, $gId, $switch{$gId});
 
-	             # pIdentity
-	             # write a function for this
-	   #          my $tId_cond1=$switch{$gId}{'C1.tId'};
-	   #          my $tId_cond2=$switch{$gId}{'C2.tId'};
-	   #          my $fa_cond1="$data_dir/$species/_ensembl$ensembl_v.prot_seq/".substr($tId_cond1, 0, 12)."/$tId_cond1.fa";
-	   #          my $fa_cond2="$data_dir/$species/_ensembl$ensembl_v.prot_seq/".substr($tId_cond2, 0, 12)."/$tId_cond2.fa";
-	   #         	my $outdir_aln="$out_dir/prot_aln/".substr($gId, 0, 12);
-
-	   #         	unless ( -e  "$out_dir/prot_aln/" ) { system("mkdir $out_dir/prot_aln/") };
-	   #         	unless ( -e  $outdir_aln ) { system("mkdir $outdir_aln") };
-	   #         	my $out_aln="$outdir_aln/tmp.$gId.needle.out";
-				# system("needle $fa_cond1 $fa_cond2 -auto stdout > $out_aln");
-	   #          $pIdentity=`cat $out_aln | grep Identity | awk -F '(' '{print \$2}' | awk -F '%' '{print \$1}' | sed 's/ //g'`;
-	   #          chomp $pIdentity;
-
-	   #          ## append maistas-formatted fa
-	   #          system("echo '\n# Input for MAISTAS\n# (http://maistas.bioinformatica.crs4.it/)\n' >> $out_aln");
-	   #          my $out="$outdir_aln/$gId.needle_mod.out";
-	   #          system("cat $out_aln $fa_cond1 $fa_cond2 > $out");
-	   #          system("rm $out_aln");
-
-	            # pdbEntry
-	            # attention here! - query first for tx data, then pdb + swissport ids
-	            # otherwise tbiotype info missing
+	            ## pdbEntry
 	            if (defined $ensembl{$gId}{'uniprotId'}) {
 		            $switch{$gId}{'pdbEntry'}=$ensembl{$gId}{'uniprotId'};
 	            } 
         }
 	       
-	}
-	print Dumper %switch;
+	}	
 	return \%switch;
+}
+
+sub _get_prot_identity {
+	my $ref_arguments=$_[0];
+	my $gId=$_[1];
+	my $ref_subset_switch=$_[2];
+
+	my %arguments=%{$ref_arguments};
+	my $out_dir=$arguments{'out_dir'};
+	my $data_dir=$arguments{'data_dir'};
+	my $species=$arguments{'species'};
+	my $ensembl_v=$arguments{'ensembl_v'};
+
+	my %subset_switch=%$ref_subset_switch;
+	my $tId_cond1=$subset_switch{'C1.tId'};
+	my $tId_cond2=$subset_switch{'C2.tId'};
+    my $fa_cond1="$data_dir/$species/_ensembl$ensembl_v.prot_seq/".substr($tId_cond1, 0, 12)."/$tId_cond1.fa";
+    my $fa_cond2="$data_dir/$species/_ensembl$ensembl_v.prot_seq/".substr($tId_cond2, 0, 12)."/$tId_cond2.fa";
+   	my $outdir_aln="$out_dir/prot_aln/".substr($gId, 0, 12);
+   	unless ( -e  "$out_dir/prot_aln/" ) { system("mkdir $out_dir/prot_aln/") };
+   	unless ( -e  $outdir_aln ) { system("mkdir $outdir_aln") };
+   	my $out_aln="$outdir_aln/$gId.needle_mod.out";
+   	my $pIdentity;
+
+   	## run needle to get protein identity
+	open(PIPE, "needle $fa_cond1 $fa_cond2 -auto stdout |") or die "Cannot open needle output: $!";
+	my @needle_output=<PIPE>;
+	close(PIPE);
+
+	my $ref_fa_cond1=_read_fa($fa_cond1);
+	my $ref_fa_cond2=_read_fa($fa_cond2);
+
+	## print output
+	open(OUT, ">$out_aln") or die "Cannot open $out_aln: $!";
+	foreach my $row (@needle_output) {
+		print OUT $row;
+
+		if ($row =~ /# Identity.+\((\d+\.\d+)/) {
+			$pIdentity=$1;
+		}
+	}
+	
+	print OUT "\n# Input for MAISTAS\n# (http://maistas.bioinformatica.crs4.it/)\n";
+
+	foreach my $row (@$ref_fa_cond1) {
+		print OUT $row;
+	}
+
+	foreach my $row (@$ref_fa_cond2) {
+		print OUT $row;
+	}
+
+    close(OUT);
+
+    ##
+    return($pIdentity);
+}
+
+sub _read_fa {
+	my $fa=$_[0];
+
+	open(IN_FA, "<$fa") or die "Cannot open $fa: $!";
+	my @fa=<IN_FA>;
+	close(IN_FA);
+
+	return(\@fa);
 }
 
 sub _is_principal {

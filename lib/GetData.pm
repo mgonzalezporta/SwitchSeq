@@ -19,7 +19,8 @@ sub get_data {
 
 	## define urls
 	my %url=(
-		ensembl 	=> "http://www.ebi.ac.uk/~mar/tools/lorem/$species/_ensembl$ensembl_v.annot_coding.txt",
+		ensembl_1 	=> "http://www.ebi.ac.uk/~mar/tools/lorem/$species/_ensembl$ensembl_v.annot_coding.1.txt",
+		ensembl_2	=> "http://www.ebi.ac.uk/~mar/tools/lorem/$species/_ensembl$ensembl_v.annot_coding.2.txt",
 		prot_seq    => "http://www.ebi.ac.uk/~mar/tools/lorem/$species/_ensembl$ensembl_v.prot_seq.tar.gz",
 		appris      => "http://www.ebi.ac.uk/~mar/tools/lorem/$species/_appris.results.rel15.9Jun2013.v2.main.tsv",
 		css         => "http://www.ebi.ac.uk/~mar/tools/lorem/css.tar.gz",
@@ -32,7 +33,8 @@ sub get_data {
 	
 	## download files
 	print "# Obtaining the necessary files...\n";
-	_get_file($url{'ensembl'}, "$data_dir/$species");
+	_get_file($url{'ensembl_1'}, "$data_dir/$species");
+	_get_file($url{'ensembl_2'}, "$data_dir/$species");
 	_get_file($url{'prot_seq'}, "$data_dir/$species");
 	_get_file($url{'appris'}, "$data_dir/$species");
 	_get_file($url{'css'}, $data_dir);

@@ -13,8 +13,8 @@ use Data::Dumper;
 my %arguments;
 
 $arguments{'help'}=0;
-$arguments{'data_dir'}="../data";
-$arguments{'out_dir'}="../html";
+$arguments{'data_dir'}="./data";
+$arguments{'out_dir'}="./html";
 $arguments{'threshold_gexp'}=0.01;
 $arguments{'tool'}="";
 
