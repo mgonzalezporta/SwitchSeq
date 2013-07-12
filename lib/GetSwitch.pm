@@ -560,8 +560,8 @@ sub _print_html {
 
 	    	## generate plots
 	    	my $gId=$row[0];
-	    	my $plot="both";	## change this
-	    	my $command="Rscript ./src/plots.R $plot $input $out_dir $data_dir $species $ensembl_v $cond1 $cond2 $gId";
+	    	my $command="Rscript ./scripts/generate_plots.R $input $out_dir $data_dir $species $ensembl_v $cond1 $cond2 $gId";
+	    	print $command;
 	    	#system($command);
 
 	    	## classify switch events based on transcript biotype info
@@ -635,8 +635,8 @@ sub _print_html {
 	_fill_template(\%to_template, $outfile);
 
 	## copy css + js
-	system("cp -R $data_dir/css $out_dir");
-	system("cp -R $data_dir/js $out_dir");
+	system("cp -R ./resources/css $out_dir");
+	system("cp -R ./resources/js $out_dir");
 }
 
 sub _fill_template {
