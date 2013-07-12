@@ -1,10 +1,36 @@
-plot_stars=function(gId, x, cond1, cond2, outfile) {
+get_outfile=function(out_dir, plot, gId) {
+	dir.create(paste(out_dir, "/plots", sep=""), showWarnings = FALSE)
+
+	out_dir_plots=paste(out_dir, "plots", plot, sep="/")
+	dir.create(out_dir_plots, showWarnings = FALSE)
+
+	subdir=paste(unlist(strsplit(gId, ''))[c(1:12)], collapse='')
+	out_subdir=paste(out_dir_plots, subdir, sep="/")
+	dir.create(out_subdir, showWarnings = FALSE)
+	
+	outfile=paste(out_subdir, "/", gId, ".pdf", sep="")
+
+	return(outfile)
+}
+
+
+
+plot_stars=function(gId, x, gexp, cond1, cond2, outfile) {
 	# data normalisation
 	for (i in 1:dim(x)[2]) {
 		x[,i]=x[,i]*abs(sqrt(gexp/max(gexp)))
 	}
 	x[is.na(x)]=0
 	x=x/max(x)
+
+	# gexp info
+	gexp_sum_cond1=summarise_gexp(gexp, cond1, "   condition 1 (left)")
+	gexp_sum_cond2=summarise_gexp(gexp, cond2, "   condition 2 (right)")
+
+	# legend title
+	legend_title=paste(gId, "\ngene expression summary (RPKMs):\n", 
+		gexp_sum_cond1, "\n", gexp_sum_cond2, "\n\n", 
+		"legend:", sep="")
 
 	# colors
 	nOfT=dim(x)[2]
@@ -45,10 +71,8 @@ plot_stars=function(gId, x, cond1, cond2, outfile) {
 		loc=rbind(loc, c(1, i))
 	}
 	loc=loc[complete.cases(loc),]
-	# loc=t(matrix(
-	# 	c(0,3, 0,2, 0,1, 1,3, 1,2, 1,1, 1,0),
-	# 	nrow=2))
 
+	# plot
 	pdf(outfile, width=4, height=h)
 		palette(col)
 		
@@ -68,13 +92,28 @@ plot_stars=function(gId, x, cond1, cond2, outfile) {
 		)
 
 		plot.new()
-		par(oma=c(0, 0, 0.7, 0))
+		par(oma=c(0, 0, 0, 0), mar=c(0, 0, 0, 0))
+
 		legend("topleft",
-			title=gId, legend=colnames(x), 
+			inset=c(0,0.18),
+			title=legend_title, 
+			title.adj=0,
+			legend=colnames(x), 
 			fill=col, 
 			border=col,
-			title.col="gray5",
+			#title.col="gray5",
 			cex=0.4
 		)
 	garbage <- dev.off()	# supress output
+}
+
+############################################
+# Internal functions
+summarise_gexp=function (gexp, cond, text) {
+	x=gexp[cond]
+	x_m=formatC(round(mean(x), 2), 2, format="f")
+	x_sd=formatC(round(sd(x), 2), 2, format="f")
+
+	result=paste(text, " - mean=", x_m, ", sd=", x_sd, sep="")
+	return(result)
 }

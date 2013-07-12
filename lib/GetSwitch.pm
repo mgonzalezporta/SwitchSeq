@@ -560,7 +560,7 @@ sub _print_html {
 
 	    	## generate plots
 	    	my $gId=$row[0];
-	    	my $command="Rscript ./scripts/generate_plots.R $input $out_dir $data_dir $species $ensembl_v $cond1 $cond2 $gId";
+	    	my $command="Rscript ./scripts/generate_plots.R $arguments{'input'} $out_dir $data_dir $species $ensembl_v $cond1 $cond2 $gId";
 	    	print $command;
 	    	#system($command);
 
