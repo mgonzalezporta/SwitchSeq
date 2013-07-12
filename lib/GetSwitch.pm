@@ -278,7 +278,7 @@ sub _print_header {
 	print $fh "C2.breadth:major_transcript_expression_breadth_-_condition_2 ";
 
 	## general info again
-	print $fh "pIdentity:identity_between_the_two_coding_sequences ";
+	print $fh "pIdentity:percentage_identity_between_the_two_coding_sequences ";
 	print $fh "pdbEntry:is_there_any_PDB_entry_available? ";
 	print $fh "rank:ranking_to_maximise_expression_breadth\n";
 }
@@ -429,7 +429,7 @@ sub _get_prot_identity {
 		}
 	}
 	
-	print OUT "\n# Input for MAISTAS\n# http://maistas.bioinformatica.crs4.it/\n";
+	print OUT "\n# Protein sequences in FASTA format\n";
 
 	foreach my $row (@$ref_fa_cond1) {
 		print OUT $row;
