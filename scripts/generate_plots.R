@@ -9,14 +9,19 @@ args=commandArgs(TRUE)
 # gId=as.character(args[8])
 
 # tmp
-input_file="/Users/mar/Desktop/app/tExp.fpkms"
+#input_file="/Users/mar/Desktop/app/tExp.fpkms"
+input_file="/Users/mar/Desktop/app/2013.05.30_45pairs.dexseq2.txt"
 out_dir="/Users/mar/Desktop/app/html_12/"
 data_dir="/Users/mar/Desktop/app/data_10/"
 species="hsa"
 ensembl_v=66
-cond1="3-5"
-cond2="6-9"
-gId="ENSG00000106771"
+#cond1="3-5"
+#cond2="6-9"
+cond1="3-48"
+cond2="49-92"
+#gId="ENSG00000106771"
+#gId="ENSG00000111615"
+gId="ENSG00000180104"
 
 # load data
 command=paste("grep", gId, input_file, sep=" ")
@@ -26,7 +31,6 @@ command=paste("head -n1", input_file, sep=" ")
 f=pipe(command)
 header=read.table(f, as.is=T)
 colnames(data)=header
-
 
 ensembl_annot=paste(data_dir, "/", species, "/_ensembl", ensembl_v, ".annot_coding.1.txt", sep="")
 command=paste("grep", gId, ensembl_annot, sep=" ")
@@ -65,7 +69,14 @@ cond2=(tmp[1]-2):(tmp[2]-2)
 
 #########
 
+
+# cond1=1:2
+# cond2=3:4
+# gexp=gexp[1:4]
+# x=x[1:4,]
+
 source("./_lib.R")
+
 outfile=get_outfile(out_dir, "starplots", gId)
 plot_stars(gId, x, gexp, cond1, cond2, outfile)
 
