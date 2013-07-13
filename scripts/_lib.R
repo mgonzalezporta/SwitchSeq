@@ -1,3 +1,40 @@
+format_cond=function(cond) {
+	x=as.numeric(strsplit(cond, "-")[[1]])
+	cond=(x[1]-2):(x[2]-2)
+	return(cond)
+}
+
+new_switch_event=function(gId, input_file, ensembl_annot) {
+	# load data
+	command=paste("head -n1", input_file, sep=" ")
+	header=read.table(pipe(command), as.is=T)
+
+	command=paste("grep", gId, input_file, sep=" ")
+	data=read.table(pipe(command), col.names=header,
+		colClasses=c("NULL", "character", rep("numeric", length(header)-2)))
+
+	# load transcript biotype info
+	command=paste("grep", gId, ensembl_annot, sep=" ")
+	tBiotype=read.table(pipe(command))[,4:5]
+	colnames(tBiotype)=c("tId", "tBiotype")
+
+	# format data
+	data=merge(tBiotype, data, by="tId")
+	header=paste(data$tId, data$tBiotype, sep=" - ")
+	data=t(data[,-c(1:2)])
+	colnames(data)=header
+
+	return(data)
+}
+
+normalise_se=function(x, gexp) {
+	for (i in 1:dim(x)[2]) {
+	        x[,i]=x[,i]/gexp
+	}
+
+	return(x)
+}
+
 get_outfile=function(out_dir, plot, gId) {
 	dir.create(paste(out_dir, "/plots", sep=""), showWarnings = FALSE)
 
