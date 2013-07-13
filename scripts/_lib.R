@@ -148,11 +148,58 @@ plot_stars=function(gId, x, gexp, cond1, cond2, outfile) {
 }
 
 plot_distrplot=function(gId, x, gexp, cond1, cond2, outfile) {
-
+	if(length(cond1)>=10 & length(cond2)>=10) {
+		plot_boxplots(gId, x, gexp, cond1, cond2, outfile)
+	} else {
+		plot_segments(gId, x, gexp, cond1, cond2, outfile)
+	}
 }
 
-############################################
-# Internal functions
+plot_segments=function(gId, data, gexp, cond1, cond2, outfile) {
+	nOfT=dim(data)[2]
+	# gexp
+	x=c(0.1,0.2)
+	y=c(mean(gexp[cond1]), mean(gexp[cond2]))
+	sd=c(sd(gexp[cond1]), sd(gexp[cond2]))
+	m=cbind(x,y,sd)
+
+	# plot
+	pdf(file=outfile, height=6, width=(4+nOfT-1))
+	#layout(1:(nOfT+2), widths=rep(2, nOfT+2))
+	layout(t(1:3), widths=c(1,1,6))
+
+		# gene expression
+		par(bty="n")
+
+		min_y=min(m[, "y"])
+		max_y=max(m[, "y"])
+		row_index_min=which(m[, "y"]==min_y)
+		if (row_index_min==1) {
+			row_index_max=2
+		} else {
+			row_index_max=1
+		}
+		ylim=c( min_y-m[row_index_min, "sd"]-1, max_y+m[row_index_max, "sd"]+1 )
+
+		col=c("red", "blue")
+		#plot(x,y,xlim=c(0,0.3),ylim=ylim, xlab="", yaxt="n", col=c("white", "gray90"))
+		plot(x,y,xlim=c(0,0.3), ylim=ylim, col=col, xaxt="n", ylab="")
+		segments(x, y-sd,x, y+sd, col=col)
+		epsilon = 0.02
+		segments(x-epsilon,y-sd,x+epsilon,y-sd, col=col)
+		segments(x-epsilon,y+sd,x+epsilon,y+sd, col=col)
+
+	
+	 #mtext("gene expression (FPKMs)", 2.5, 1)
+	 # axis(1, labels=F, lwd.ticks=0, lwd=1, at=c(1,2))
+	 # mtext(gId, 0.75, 2)
+	
+	# frame()
+		# par
+	#	par(oma=c(4.5, 12, 0.5, 0.5), las=1, cex=1)
+	garbage<-dev.off()	# supress output
+}
+
 summarise_gexp=function (gexp, cond, text) {
 	x=gexp[cond]
 	x_m=formatC(round(mean(x), 2), 2, format="f")
@@ -241,6 +288,7 @@ plot_boxplots=function(gId, x, gexp) {
 	mtext(gId, 2, 0.75)
 	
 	frame()
+
 	# texp
 	par(mar=c(0.2, 0.2, 0.2, 0.2))
 		# `mar` controls the space around each boxplot group
@@ -248,8 +296,6 @@ plot_boxplots=function(gId, x, gexp) {
 	# Plot all the boxes
 	for(i in 1:length(ltexp)){
 		boxplot(ltexp[[i]], ylim=c(0,1), axes=F, outline=T, pch=20, horizontal=TRUE, col=col[,i])
-	#	beeswarm(ltexp[[i]][,1], add=TRUE, horizontal=T, col=col[1], pch=20, at=1)
-	#	beeswarm(ltexp[[i]][,2], add=TRUE, horizontal=T, col=col[2], pch=20, at=2)
 	
 		# tIds
 	        axis(2, labels=F, lwd.ticks=0, lwd=1, at=c(1,2))

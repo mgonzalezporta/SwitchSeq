@@ -41,4 +41,4 @@ outfile=get_outfile(out_dir, "starplots", gId)
 plot_stars(gId, x, gexp, cond1, cond2, outfile)
 
 outfile=get_outfile(out_dir, "distrplots", gId)
-plot_distrplot(gId, x, gexp, out_dir_plots)
+plot_distrplot(gId, x, gexp, cond1, cond2, outfile)
