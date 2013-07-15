@@ -17,8 +17,8 @@ species="hsa"
 ensembl_v=66
 #cond1="3-5"
 #cond2="6-9"
-cond1="3-48"
-cond2="49-92"
+cond1="8-10"
+cond2="49-51"
 ensembl_annot=paste(data_dir, "/", species, "/_ensembl", ensembl_v, ".annot_coding.1.txt", sep="")
 #gId="ENSG00000106771"
 #gId="ENSG00000111615"
@@ -32,13 +32,19 @@ cond1=format_cond(cond1)
 cond2=format_cond(cond2)
 
 # data
+source("./_lib.R")
 se=new_switch_event(gId, input_file, ensembl_annot)
 gexp=apply(se, 1, sum)
 norm_se=normalise_se(se, gexp)
 
 # plots
-outfile=get_outfile(out_dir, "starplots", gId)
-plot_stars(gId, x, gexp, cond1, cond2, outfile)
+# outfile=get_outfile(out_dir, "starplots", gId)
+# plot_stars(gId, x, gexp, cond1, cond2, outfile)
 
 outfile=get_outfile(out_dir, "distrplots", gId)
-plot_distrplot(gId, x, gexp, cond1, cond2, outfile)
+plot_distrplot(gId, norm_se, gexp, cond1, cond2, outfile)
+
+
+source("./_lib.R")
+plot_distrplot(gId, norm_se, gexp, cond1, cond2, outfile)
+
