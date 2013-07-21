@@ -22,49 +22,46 @@ new_switch_event=function(gId, input_file, ensembl_annot) {
 	return(data)
 }
 
-plot_stars=function(gId, x, gexp, cond1, cond2, outfile) {
-	# data normalisation
+scale_se=function(x, gexp) {
 	for (i in 1:dim(x)[2]) {
 		x[,i]=x[,i]*abs(sqrt(gexp/max(gexp)))
 	}
 	x[is.na(x)]=0
 	x=x/max(x)
 
+	return(x)
+}
+
+plot_stars=function(gId, data, gexp, cond1, cond2, outfile) {
+
 	# gexp info
 	gexp_sum_cond1=summarise_gexp(gexp, cond1, "   condition 1 (left)")
 	gexp_sum_cond2=summarise_gexp(gexp, cond2, "   condition 2 (right)")
 
+	# dominance info
+	dom_sum_cond1=summarise_dominance(data, cond1, "   condition 1 (left)")
+	dom_sum_cond2=summarise_dominance(data, cond2, "   condition 2 (right)")
+
 	# legend title
-	legend_title=paste(gId, "\ngene expression summary (RPKMs):\n", 
-		gexp_sum_cond1, "\n", gexp_sum_cond2, "\n\n", 
+	legend_title=paste(gId, "\n\n",
+		"gene expression summary (RPKMs):\n", 
+		gexp_sum_cond1, "\n", 
+		gexp_sum_cond2, "\n\n",
+		"dominance summary:\n",
+		dom_sum_cond1, "\n",
+		dom_sum_cond2, "\n\n", 
 		"legend:", sep="")
 
 	# colors
-	nOfT=dim(x)[2]
-	biotypes=unlist(strsplit(colnames(x), " - "))
-	biotypes=data.frame(table(biotypes[seq(1, length(biotypes), by=2)]))
-	colnames(biotypes)=c("tBiotype", "n")
-	
-	col_intervals=t(data.frame(
-	        c("nonsense_mediated_decay", 0.05, 0.15),
-	        c("processed_transcript", 0.3, 0.4),
-	        c("protein_coding", 0.6, 0.7),
-	        c("retained_intron", 0.85, 0.95)
-	))
-	rownames(col_intervals)=NULL
-	colnames(col_intervals)=c("tBiotype", "start", "end")
-	
-	m=merge(biotypes, col_intervals, by="tBiotype")
-	
-	col=c()
-	for (i in 1:dim(m)[1]) {
-	        n=as.numeric(as.character(m[i,]$n))
-	        start=as.numeric(as.character(m[i,]$start))
-	        end=as.numeric(as.character(m[i,]$end))
-	        col=c(col, rainbow( n, s = 0.7, v = 0.8, alpha=0.7, start=start ,end=end))
-	}
-	
-	# plot layout
+	col=get_transcript_colors(data)
+	col=unlist(col)[seq(1, length(unlist(col)), by=2)]
+
+	# data normalisation
+	data=data[c(cond1, cond2),]	## tmp
+	gexp=gexp[c(cond1, cond2)]	## tmp
+	data_scaled=scale_se(data, gexp)
+
+	# plot height
 	nrows_layout=max(length(cond1), length(cond2))
 	if (nrows_layout<6) { 
 		h=3 
@@ -72,6 +69,7 @@ plot_stars=function(gId, x, gexp, cond1, cond2, outfile) {
 		h=nrows_layout*.5
 	}
 
+	# subplot location
 	loc=matrix(ncol=2)
 	for (i in seq(nrows_layout-1, by=-1, length.out=length(cond1))) {
 		loc=rbind(loc, c(0, i))
@@ -83,14 +81,11 @@ plot_stars=function(gId, x, gexp, cond1, cond2, outfile) {
 
 	# plot
 	pdf(outfile, width=4, height=h)
-		palette(col)
-		
-		par(fg="white", col="gray35")
-		par(mar=c(0, 0, 0, 0))
-		par(oma=c(0, 0, 0, 0))
-		par(mfrow=c(1,2))	
+		layout(t(1:2), widths=c(1,1.3))
+		par(fg="white", col="gray35",
+			mar=c(0, 0, 0, 0), oma=c(0, 0, 0, 0))
 			
-		stars(x, 
+		stars(data_scaled, 
 		    draw.segments = T,
 			cex.main=0.6,
 			cex=0.3,
@@ -100,20 +95,16 @@ plot_stars=function(gId, x, gexp, cond1, cond2, outfile) {
 			locations=loc
 		)
 
+		# legend
 		plot.new()
-		par(oma=c(0, 0, 0, 0), mar=c(0, 0, 0, 0))
-
-		if (h<5) { inset_y=0.18 }
-		if (h>=5 & h<10) { inset_y=0.10 }
-		if (h>=10) { inset_y=0.06 }
-		legend("topleft",
-			inset=c(0,inset_y),
+		par(oma=c(0,0,5,0), mar=c(0,0,0,0), xpd=NA)
+		legend("center",
 			title=legend_title, 
 			title.adj=0,
-			legend=colnames(x), 
+			adj=0,
+			legend=colnames(data_scaled), 
 			fill=col, 
 			border=col,
-			#title.col="gray5",
 			cex=0.4
 		)
 	garbage <- dev.off()	# supress output
@@ -351,13 +342,6 @@ get_transcript_colors=function(x) {
         )
         names(col)=rep(paste(biotype, 1:n, sep="_"), 2)
         result=c(result, split(col, names(col)))
-
-  #       result=c(result, list())
-
-		# tcol=t(data.frame(
-		# ))
-		# rownames(tcol)=c("N", "T")
-		# col=cbind(col, tcol)
 	}
 	return(result)
 
@@ -405,6 +389,15 @@ get_outfile=function(out_dir, plot, gId) {
 
 summarise_gexp=function (gexp, cond, text) {
 	x=gexp[cond]
+	x_m=formatC(round(mean(x), 2), 2, format="f")
+	x_sd=formatC(round(sd(x), 2), 2, format="f")
+
+	result=paste(text, " - mean=", x_m, ", sd=", x_sd, sep="")
+	return(result)
+}
+
+summarise_dominance=function(data, cond, text) {
+	x=calculate_dominance(data[cond,])
 	x_m=formatC(round(mean(x), 2), 2, format="f")
 	x_sd=formatC(round(sd(x), 2), 2, format="f")
 
