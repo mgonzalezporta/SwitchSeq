@@ -22,15 +22,15 @@ new_switch_event=function(gId, input_file, ensembl_annot) {
 	return(data)
 }
 
-scale_se=function(x, gexp) {
-	for (i in 1:dim(x)[2]) {
-		x[,i]=x[,i]*abs(sqrt(gexp/max(gexp)))
-	}
-	x[is.na(x)]=0
-	x=x/max(x)
+# scale_se=function(x, gexp) {
+# 	for (i in 1:dim(x)[2]) {
+# 		x[,i]=x[,i]*abs(sqrt(gexp/max(gexp)))
+# 	}
+# 	x[is.na(x)]=0
+# 	x=x/max(x)
 
-	return(x)
-}
+# 	return(x)
+# }
 
 plot_stars=function(gId, data, gexp, cond1, cond2, outfile) {
 
@@ -347,30 +347,30 @@ get_transcript_colors=function(x) {
 
 }
 
-get_ratio_second=function(x) {
-	x=x[order(x, decreasing=T)]
-	r=x[2]/x[1]
-	return(r)
-}
+# get_ratio_second=function(x) {
+# 	x=x[order(x, decreasing=T)]
+# 	r=x[2]/x[1]
+# 	return(r)
+# }
 
-calculate_dominance=function(x) {
-	r=apply(x, 1, get_ratio_second)
-	return(r)
-}
+# calculate_dominance=function(x) {
+# 	r=apply(x, 1, get_ratio_second)
+# 	return(r)
+# }
 
-format_cond=function(cond) {
-	x=as.numeric(strsplit(cond, "-")[[1]])
-	cond=(x[1]-2):(x[2]-2)
-	return(cond)
-}
+# format_cond=function(cond) {
+# 	x=as.numeric(strsplit(cond, "-")[[1]])
+# 	cond=(x[1]-2):(x[2]-2)
+# 	return(cond)
+# }
 
-normalise_se=function(x, gexp) {
-	for (i in 1:dim(x)[2]) {
-	        x[,i]=x[,i]/gexp
-	}
+# normalise_se=function(x, gexp) {
+# 	for (i in 1:dim(x)[2]) {
+# 	        x[,i]=x[,i]/gexp
+# 	}
 
-	return(x)
-}
+# 	return(x)
+# }
 
 get_outfile=function(out_dir, plot, gId) {
 	dir.create(paste(out_dir, "/plots", sep=""), showWarnings = FALSE)

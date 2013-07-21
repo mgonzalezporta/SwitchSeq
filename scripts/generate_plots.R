@@ -15,13 +15,9 @@ out_dir="/Users/mar/Desktop/app/html_12/"
 data_dir="/Users/mar/Desktop/app/data_10/"
 species="hsa"
 ensembl_v=66
-#cond1="3-5"
-#cond2="6-9"
 cond1="3-4"
 cond2="49-50"
 ensembl_annot=paste(data_dir, "/", species, "/_ensembl", ensembl_v, ".annot_coding.1.txt", sep="")
-#gId="ENSG00000106771"
-#gId="ENSG00000111615"
 gId="ENSG00000180104"
 
 
@@ -32,7 +28,7 @@ cond1=format_cond(cond1)
 cond2=format_cond(cond2)
 
 # data
-source("./_lib.R")
+
 se=new_switch_event(gId, input_file, ensembl_annot)
 gexp=apply(se, 1, sum)
 norm_se=normalise_se(se, gexp)
@@ -45,3 +41,18 @@ plot_stars(gId, norm_se, gexp, cond1, cond2, outfile)
 outfile=get_outfile(out_dir, "distrplots", gId)
 plot_distrplot(gId, norm_se, gexp, cond1, cond2, outfile)
 
+
+###########
+
+input_file="/Users/mar/Desktop/app/2013.05.30_45pairs.dexseq2.txt"
+out_dir="/Users/mar/Desktop/app/html_12/"
+data_dir="/Users/mar/Desktop/app/data_10/"
+species="hsa"
+ensembl_v=66
+cond1="3-4"
+cond2="49-50"
+ensembl_annot=paste(data_dir, "/", species, "/_ensembl", ensembl_v, ".annot_coding.1.txt", sep="")
+gId="ENSG00000180104"
+
+source("./PlotRNASeq.R")
+readTranscriptExpressionSet(gId=gId, infile=input_file, cond1=cond1, cond2=cond2)
