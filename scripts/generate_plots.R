@@ -8,51 +8,25 @@ args=commandArgs(TRUE)
 # cond2=as.character(args[7])
 # gId=as.character(args[8])
 
-# tmp
-#input_file="/Users/mar/Desktop/app/tExp.fpkms"
 input_file="/Users/mar/Desktop/app/2013.05.30_45pairs.dexseq2.txt"
-out_dir="/Users/mar/Desktop/app/html_12/"
+outdir="/Users/mar/Desktop/app/html_12/"
 data_dir="/Users/mar/Desktop/app/data_10/"
 species="hsa"
 ensembl_v=66
-cond1="3-4"
-cond2="49-50"
+cond1="3-45"
+cond2="49-89"
 ensembl_annot=paste(data_dir, "/", species, "/_ensembl", ensembl_v, ".annot_coding.1.txt", sep="")
 gId="ENSG00000180104"
 
+source("./PlotRNASeq/PlotRNASeq.R")
 
-source("./_lib.R")
+## create TranscriptExpressionSet object
+tes=readTranscriptExpressionSet(gId=gId, infile=input_file, cond1=cond1, cond2=cond2)
+tes=annotateTranscriptExpressionSet(gId=gId, infile=ensembl_annot, tes=tes)
 
-# args
-cond1=format_cond(cond1)
-cond2=format_cond(cond2)
+## generate plots
+outfile=getOutfile(gId=gId, plot_type="starplots", outdir=outdir)
+plotStars(tes=tes, outfile="~/Desktop/test.stars.pdf")
 
-# data
-
-se=new_switch_event(gId, input_file, ensembl_annot)
-gexp=apply(se, 1, sum)
-norm_se=normalise_se(se, gexp)
-
-# plots
-outfile=get_outfile(out_dir, "starplots", gId)
-rownames(norm_se)=c(rep("N", 45), rep("T", 45))
-plot_stars(gId, norm_se, gexp, cond1, cond2, outfile)
-
-outfile=get_outfile(out_dir, "distrplots", gId)
-plot_distrplot(gId, norm_se, gexp, cond1, cond2, outfile)
-
-
-###########
-
-input_file="/Users/mar/Desktop/app/2013.05.30_45pairs.dexseq2.txt"
-out_dir="/Users/mar/Desktop/app/html_12/"
-data_dir="/Users/mar/Desktop/app/data_10/"
-species="hsa"
-ensembl_v=66
-cond1="3-4"
-cond2="49-50"
-ensembl_annot=paste(data_dir, "/", species, "/_ensembl", ensembl_v, ".annot_coding.1.txt", sep="")
-gId="ENSG00000180104"
-
-source("./PlotRNASeq.R")
-readTranscriptExpressionSet(gId=gId, infile=input_file, cond1=cond1, cond2=cond2)
+outfile=getOutfile(gId=gId, plot_type="distrplots", outdir=outdir)
+plotDistr(tes=tes, outfile="~/Desktop/test.distr.pdf")
