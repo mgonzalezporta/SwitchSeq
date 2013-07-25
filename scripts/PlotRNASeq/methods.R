@@ -1,6 +1,6 @@
 ## initialize
 setMethod("initialize", "TranscriptExpressionSet",
-  function(.Object, id=id, rpkms=rpkms, conditions=conditions){
+  function(.Object, id=id, rpkms=rpkms, biotypes=biotypes, conditions=conditions){
     .Object@id=id
     .Object@rpkms=rpkms
     .Object@conditions=conditions
@@ -8,6 +8,8 @@ setMethod("initialize", "TranscriptExpressionSet",
     .Object@dominance=.calculate_dominance(.Object)
     .Object@.relexp=.calculate_relexp(.Object)
     .Object@.scaledexp=.calculate_scaledexp(.Object)
+    .Object@biotypes=biotypes
+    .Object@.cols=.get_transcript_colors(.Object)
     return(.Object)
   })
 
@@ -18,13 +20,13 @@ setMethod("show",
     cat("Object of class",class(object),"\n")
     cat("   Id:",id(object),"\n")
     cat("   RPKMs: data frame with", dim(object@rpkms)[1], "transcripts and", dim(object@rpkms)[2], "samples\n")
-    cat("     transcripts:", head(rownames(object@rpkms)), "(...)\n")
-    cat("     samples:", head(colnames(object@rpkms)), "(...)\n")
+    cat("     transcripts:", head(rownames(object@rpkms), n=4), "(...)\n")
+    cat("     samples:", head(colnames(object@rpkms), n=4), "(...)\n")
     cat("   Conditions:\n")
-    cat("     condition 1:", head(object@conditions$cond1), "(...)\n")
-    cat("     condition 2:", head(object@conditions$cond2), "(...)\n")
-    cat("   Gene expression:", head(object@gexp), "(...)\n")
-    cat("   Dominance:", head(object@dominance), "(...)\n")
+    cat("     condition 1:", head(object@conditions$cond1, n=4), "(...)\n")
+    cat("     condition 2:", head(object@conditions$cond2, n=4), "(...)\n")
+    cat("   Gene expression:", head(object@gexp, n=4), "(...)\n")
+    cat("   Dominance:", head(object@dominance, n=4), "(...)\n")
     cat("   Transcript biotypes:", names(table(tes@biotypes$tBiotype)), "\n")
   })
 

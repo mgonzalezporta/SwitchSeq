@@ -1,4 +1,4 @@
-source("./AllClasses.R")
-source("./AllGenerics.R")
-source("./methods.R")
-source("./functions.R")
+source("./PlotRNASeq/AllClasses.R")
+source("./PlotRNASeq/AllGenerics.R")
+source("./PlotRNASeq/methods.R")
+source("./PlotRNASeq/functions.R")

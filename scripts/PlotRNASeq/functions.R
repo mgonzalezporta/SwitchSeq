@@ -1,4 +1,4 @@
-readTranscriptExpressionSet=function(gId=gId, infile=infile, cond1=cond1, cond2=cond2) {
+readExpressionData=function(gId=gId, infile=infile, cond1=cond1, cond2=cond2) {
   # header
   command=paste("head -n1", infile, sep=" ")
   header=read.table(pipe(command), as.is=T)
@@ -14,7 +14,23 @@ readTranscriptExpressionSet=function(gId=gId, infile=infile, cond1=cond1, cond2=
   rpkms=as.matrix(data[,c(cond1, cond2)])
   rownames(rpkms)=data[,1]
 
-  # recalculate conditions
+  return(rpkms)
+}
+
+readBiotypeData=function(gId=gId, infile=infile) {
+  # biotype info
+  command=paste("grep", gId, infile, sep=" ")
+  tBiotype=read.table(pipe(command))[,4:5]
+  colnames(tBiotype)=c("tId", "tBiotype")
+
+  return(tBiotype)
+}
+
+newTranscriptExpressionSet=function(gId=gId, rpkms=rpkms, biotypes=biotypes, cond1=cond1, cond2=cond2) {
+  # conditions
+  cond1=.format_cond(cond1)
+  cond2=.format_cond(cond2)
+
   cond1=cond1-1
   cond2=seq(from=length(cond1)+1, to=dim(rpkms)[2], by=1)
   conditions=list(cond1=cond1, cond2=cond2)
@@ -23,22 +39,9 @@ readTranscriptExpressionSet=function(gId=gId, infile=infile, cond1=cond1, cond2=
   tes=new("TranscriptExpressionSet",
     id=gId,
     conditions=conditions,
-    rpkms=rpkms
+    rpkms=rpkms,
+    biotypes=biotypes
   )
-
-  return(tes)
-}
-
-annotateTranscriptExpressionSet=function(gId=gId, infile=infile, tes=tes) {
-  # biotype info
-  command=paste("grep", gId, infile, sep=" ")
-  tBiotype=read.table(pipe(command))[,4:5]
-  colnames(tBiotype)=c("tId", "tBiotype")
-
-  tes@biotypes=tBiotype
-  
-  # colors
-  tes@.cols=.get_transcript_colors(tes)
 
   return(tes)
 }
