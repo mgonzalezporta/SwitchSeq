@@ -154,14 +154,3 @@ function fnShowHide( iCol )
 	var bVis = oTable.fnSettings().aoColumns[iCol].bVisible;
 	oTable.fnSetColumnVis( iCol, bVis ? false : true );
 }
-
-
-/* Table initialisation */
-$(document).ready(function() {
-	$('#main').dataTable( {
-		"sDom": "<'row-fluid'<'span6'T><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-		"oTableTools": {
-			"aButtons": [ "print" ]
-		}
-	} );
-} );

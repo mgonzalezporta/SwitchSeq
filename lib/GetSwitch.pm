@@ -11,7 +11,7 @@ use List::Util qw[ max ];
 use Text::Template;
 use FindBin qw($Bin);
 use Data::Dumper;
-#use JSON;
+use JSON;
 
 our @ISA= qw( Exporter );
 our @EXPORT = qw( get_switch );
@@ -43,7 +43,7 @@ sub get_switch {
 
 	## print output
 	_print_txt($ref_switch, $ref_arguments);
-	#_print_json($ref_switch, $ref_arguments);
+	_print_json($ref_switch, $ref_arguments);
 	_print_html($ref_switch, $ref_arguments);
 
 	## progress
@@ -533,10 +533,29 @@ sub _print_json {
 
 	my %arguments=%$ref_arguments;
 	my $out_dir=$arguments{'out_dir'};
-	my $out_file="$out_dir/switch.json";
+	my $out_file="$out_dir/js/data.js";
 
+	## convert initial hash to array of hashes
+	my %switch=%$ref_switch;
+	my @array_input;
+	foreach my $gId (keys %switch) {
+		my %tmp_hash;
+		
+		$tmp_hash{'gId'}=$gId;
+		## js doesn't allow . in hash keys
+		foreach my $k (keys %{$switch{$gId}}) {
+			my $value=$switch{$gId}{$k};
+			$k =~ s/\./_/;
+			$tmp_hash{$k}=$value;
+		}
+		
+		push(@array_input, \%tmp_hash)
+	}
+
+	## print js variable
 	open(OUT, ">$out_file") or die "Could not open $out_file: $!";
-	print OUT to_json($ref_switch, { pretty => 1 });
+	print OUT "var data = \n";
+	print OUT to_json(\@array_input, { pretty => 1 });
 	close(OUT);
 }
 
