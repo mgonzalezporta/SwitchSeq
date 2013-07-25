@@ -9,6 +9,7 @@ use Bio::SeqIO;
 use List::Util qw[ max ];
 #use lib '/usr/local/ActivePerl-5.16/html/site/lib/';
 use Text::Template;
+use FindBin qw($Bin);
 use Data::Dumper;
 #use JSON;
 
@@ -581,8 +582,8 @@ sub _print_html {
 	    	my $expdata=$arguments{'input'};
 	    	my $annot=$data_dir."/".$species."/_ensembl".$ensembl_v.".annot_coding.1.txt";
 	    	my $command="R CMD BATCH ".
-	    		"\"--args gId='$gId' expdata='$expdata' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
-	    		"./scripts/generate_plots.R /dev/null";
+	    		"\"--args bin='$Bin' gId='$gId' expdata='$expdata' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
+	    		"$Bin/scripts/generate_plots.R $gId.out";
 	    	print $command."\n";
 	    	system($command);
 
@@ -658,15 +659,15 @@ sub _print_html {
 	_fill_template(\%to_template, $outfile);
 
 	## copy css + js
-	system("cp -R ./resources/css $out_dir");
-	system("cp -R ./resources/js $out_dir");
+	system("cp -R $Bin/resources/css $out_dir");
+	system("cp -R $Bin/resources/js $out_dir");
 }
 
 sub _fill_template {
 	my $ref_to_template=$_[0];
 	my $outfile=$_[1];
 
-	my $template = Text::Template->new(SOURCE => './templates/index.tmpl')
+	my $template = Text::Template->new(SOURCE => "$Bin/templates/index.tmpl")
 	 	or die "Couldn't construct template: $Text::Template::ERROR";
 	my $result = $template->fill_in(HASH => $ref_to_template);
 
