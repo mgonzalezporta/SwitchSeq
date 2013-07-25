@@ -10,6 +10,7 @@ use List::Util qw[ max ];
 #use lib '/usr/local/ActivePerl-5.16/html/site/lib/';
 use Text::Template;
 use Data::Dumper;
+use JSON;
 
 our @ISA= qw( Exporter );
 our @EXPORT = qw( get_switch );
@@ -41,7 +42,8 @@ sub get_switch {
 
 	## print output
 	_print_txt($ref_switch, $ref_arguments);
-	_print_html($ref_arguments);
+	_print_json($ref_switch, $ref_arguments);
+	# _print_html($ref_arguments);
 
 	## progress
 	my $count=keys %$ref_switch;
@@ -253,34 +255,36 @@ sub _load_appris {
     return \%appris;
 }
 
-sub _print_header {
-	my $fh=$_[0];
+sub _get_header {
+	my @header;
 
 	## general gene info
-	print $fh "gId:ensembl_gene_id ";
-	print $fh "gName:gene_name ";
-	print $fh "nOfT:number_of_annotated_transcripts ";
+	push(@header, "gId:ensembl_gene_id ");
+	push(@header, "gName:gene_name ");
+	push(@header, "nOfT:number_of_annotated_transcripts ");
 
 	## condition 1
-	print $fh "C1.tId:major_transcript_-_condition_1 ";
-	print $fh "C1.principal:is_the_transcript_classified_as_principal_in_APPRIS?_-_condition_1 ";
-	print $fh "C1.biotype:major_transcript_biotype_-_condition_1 ";
-	print $fh "C1.tExp:in_how_many_samples_is_the_transcript_detected_as_major?_-_condition_1 ";
-	print $fh "C1.gExp:in_how_many_samples_is_the_gene_expressed?_-_condition_1 ";
-	print $fh "C1.breadth:major_transcript_expression_breadth_-_condition_1 ";
+	push(@header, "C1.tId:major_transcript_-_condition_1 ");
+	push(@header, "C1.principal:is_the_transcript_classified_as_principal_in_APPRIS?_-_condition_1 ");
+	push(@header, "C1.biotype:major_transcript_biotype_-_condition_1 ");
+	push(@header, "C1.tExp:in_how_many_samples_is_the_transcript_detected_as_major?_-_condition_1 ");
+	push(@header, "C1.gExp:in_how_many_samples_is_the_gene_expressed?_-_condition_1 ");
+	push(@header, "C1.breadth:major_transcript_expression_breadth_-_condition_1 ");
 
 	## condition 2
-	print $fh "C2.tId:major_transcript_-_condition_2 ";
-	print $fh "C2.principal:is_the_transcript_classified_as_principal_in_APPRIS?_-_condition_2 ";
-	print $fh "C2.biotype:major_transcript_biotype_-_condition_2 ";
-	print $fh "C2.tExp:in_how_many_samples_is_the_transcript_detected_as_major?_-_condition_2 ";
-	print $fh "C2.gExp:in_how_many_samples_is_the_gene_expressed?_-_condition_2 ";
-	print $fh "C2.breadth:major_transcript_expression_breadth_-_condition_2 ";
+	push(@header, "C2.tId:major_transcript_-_condition_2 ");
+	push(@header, "C2.principal:is_the_transcript_classified_as_principal_in_APPRIS?_-_condition_2 ");
+	push(@header, "C2.biotype:major_transcript_biotype_-_condition_2 ");
+	push(@header, "C2.tExp:in_how_many_samples_is_the_transcript_detected_as_major?_-_condition_2 ");
+	push(@header, "C2.gExp:in_how_many_samples_is_the_gene_expressed?_-_condition_2 ");
+	push(@header, "C2.breadth:major_transcript_expression_breadth_-_condition_2 ");
 
 	## general info again
-	print $fh "pIdentity:percentage_identity_between_the_two_coding_sequences ";
-	print $fh "pdbEntry:is_there_any_PDB_entry_available? ";
-	print $fh "rank:ranking_to_maximise_expression_breadth\n";
+	push(@header, "pIdentity:percentage_identity_between_the_two_coding_sequences ");
+	push(@header, "pdbEntry:is_there_any_PDB_entry_available? ");
+	push(@header, "rank:ranking_to_maximise_expression_breadth\n");
+
+	return(\@header);
 }
 
 sub _find_switch {
@@ -505,10 +509,10 @@ sub _print_txt {
 
 	## prepare output
 	open(my $fh, ">$out_file") or die "Could not open $out_file: $!";
-	_print_header($fh);
+	my $ref_header=_get_header;
+	print $fh @$ref_header;
 
 	foreach my $gId (keys %switch) {
-		#print "$gId\n";
 		print $fh "$gId $switch{$gId}{'gName'} $switch{$gId}{'nOfT'} ";
 		print $fh "$switch{$gId}{'C1.tId'} $switch{$gId}{'C1.principal'} ";
 		print $fh "$switch{$gId}{'C1.biotype'} $switch{$gId}{'C1.tExp'} ";
@@ -520,6 +524,19 @@ sub _print_txt {
 		print $fh "$switch{$gId}{'rank'}\n";
 	}
     close($fh);
+}
+
+sub _print_json {
+	my $ref_switch=$_[0];
+	my $ref_arguments=$_[1];
+
+	my %arguments=%$ref_arguments;
+	my $out_dir=$arguments{'out_dir'};
+	my $out_file="$out_dir/switch.json";
+
+	open(OUT, ">$out_file") or die "Could not open $out_file: $!";
+	print OUT to_json($ref_switch, { pretty => 1 });
+	close(OUT);
 }
 
 sub _print_html {
