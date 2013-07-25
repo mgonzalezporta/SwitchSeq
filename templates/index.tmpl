@@ -17,40 +17,39 @@
 	<div class="container">
 		<div class="accordion" id="accordion_options">
 			<div class="accordion-group">
-				<div class="accordion-group">
-					<div class="accordion-heading">
-					  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#info">
-					    <b>Execution information</b>
-					  </a>
-					</div>
-				    <div id="info" class="accordion-body collapse">
-					    <div class="accordion-inner">
-					    	<p><b>Input:</b> {$info{'input'}}</p>
-					    	<p><b>Data directory:</b> {$info{'data_dir'}}</p>
-					    	<p><b>Species:</b> {$info{'species'}}</p>
-					    	<p><b>Ensembl version:</b> {$info{'ensembl_v'}}</p>
-					    	<p><b>Condition 1:</b> 
-					    		columns { $info{'cond1'} },
-					    		{ 
-					    		my @cols=split('-', $info{'cond1'});
-					    		my $ncols=$cols[1]-$cols[0]+1;
-					    		$ncols
-					    		} samples
-					    	</p>
-					    	<p><b>Condition 2:</b> 
-					    		columns { $info{'cond2'} },
-					    		{ 
-					    		my @cols=split('-', $info{'cond2'});
-					    		my $ncols=$cols[1]-$cols[0]+1;
-					    		$ncols
-					    		} samples
-					    	</p>
-					 
-					    </div>
+				<div class="accordion-heading">
+				  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#info">
+				    <b>Execution information</b>
+				  </a>
+				</div>
+			    <div id="info" class="accordion-body collapse">
+				    <div class="accordion-inner">
+				    	<p><b>Input:</b> {$info{'input'}}</p>
+				    	<p><b>Data directory:</b> {$info{'data_dir'}}</p>
+				    	<p><b>Species:</b> {$info{'species'}}</p>
+				    	<p><b>Ensembl version:</b> {$info{'ensembl_v'}}</p>
+				    	<p><b>Condition 1:</b> 
+				    		columns { $info{'cond1'} },
+				    		{ 
+				    		my @cols=split('-', $info{'cond1'});
+				    		my $ncols=$cols[1]-$cols[0]+1;
+				    		$ncols
+				    		} samples
+				    	</p>
+				    	<p><b>Condition 2:</b> 
+				    		columns { $info{'cond2'} },
+				    		{ 
+				    		my @cols=split('-', $info{'cond2'});
+				    		my $ncols=$cols[1]-$cols[0]+1;
+				    		$ncols
+				    		} samples
+				    	</p>
+				 
 				    </div>
-			  	</div>
+			    </div>
+		  	</div>
 
-
+			 <div class="accordion-group">
 			    <div class="accordion-heading">
 			      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#filter">
 			        <b>1. Filter</b>
@@ -149,7 +148,7 @@
 					}
 				    </div>
 			    </div>
-		  	</div>
+			</div>
 		</div>
 	</div>
 

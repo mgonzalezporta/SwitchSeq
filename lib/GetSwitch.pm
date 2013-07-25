@@ -10,7 +10,7 @@ use List::Util qw[ max ];
 #use lib '/usr/local/ActivePerl-5.16/html/site/lib/';
 use Text::Template;
 use Data::Dumper;
-use JSON;
+#use JSON;
 
 our @ISA= qw( Exporter );
 our @EXPORT = qw( get_switch );
@@ -42,8 +42,8 @@ sub get_switch {
 
 	## print output
 	_print_txt($ref_switch, $ref_arguments);
-	_print_json($ref_switch, $ref_arguments);
-	# _print_html($ref_arguments);
+	#_print_json($ref_switch, $ref_arguments);
+	_print_html($ref_switch, $ref_arguments);
 
 	## progress
 	my $count=keys %$ref_switch;
@@ -541,7 +541,8 @@ sub _print_json {
 
 sub _print_html {
 	## collect arguments
-	my $ref_arguments=$_[0];
+	my $ref_switch=$_[0];
+	my $ref_arguments=$_[1];
 	my %arguments=%{$ref_arguments};
 	my $out_dir=$arguments{'out_dir'};
 	my $data_dir=$arguments{'data_dir'};
@@ -578,7 +579,7 @@ sub _print_html {
 	    	## generate plots
 	    	my $gId=$row[0];
 	    	my $command="Rscript ./scripts/generate_plots.R $arguments{'input'} $out_dir $data_dir $species $ensembl_v $cond1 $cond2 $gId";
-	    	print $command;
+	    	#print $command;
 	    	#system($command);
 
 	    	## classify switch events based on transcript biotype info
@@ -607,17 +608,18 @@ sub _print_html {
 	close INPUT;
 
 	## save summary statistics
-	my %count = (
-		pc_to_pc => scalar( @{ $data{'pc_to_pc'} } ),
-		pc_to_nmd => scalar( @{ $data{'pc_to_nmd'} } ),
-		pc_to_ri => scalar( @{ $data{'pc_to_ri'} } ),
-		pc_to_pt => scalar( @{ $data{'pc_to_pt'} } ),
-		nmd_to_pc => scalar( @{ $data{'nmd_to_pc'} } ),
-		ri_to_pc => scalar( @{ $data{'ri_to_pc'} } ),
-		pt_to_pc => scalar( @{ $data{'pt_to_pc'} } ),
-		other => scalar( @{ $data{'other'} } ),
-		total => $total
-	);
+	my %count;
+	# my %count = (
+	# 	pc_to_pc => scalar( @{ $data{'pc_to_pc'} } ),
+	# 	pc_to_nmd => scalar( @{ $data{'pc_to_nmd'} } ),
+	# 	pc_to_ri => scalar( @{ $data{'pc_to_ri'} } ),
+	# 	pc_to_pt => scalar( @{ $data{'pc_to_pt'} } ),
+	# 	nmd_to_pc => scalar( @{ $data{'nmd_to_pc'} } ),
+	# 	ri_to_pc => scalar( @{ $data{'ri_to_pc'} } ),
+	# 	pt_to_pc => scalar( @{ $data{'pt_to_pc'} } ),
+	# 	other => scalar( @{ $data{'other'} } ),
+	# 	total => $total
+	# );
 
 	## output
 
