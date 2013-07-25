@@ -1,4 +1,4 @@
-source("./PlotRNASeq/AllClasses.R")
-source("./PlotRNASeq/AllGenerics.R")
-source("./PlotRNASeq/methods.R")
-source("./PlotRNASeq/functions.R")
+source("./scripts/PlotRNASeq/AllClasses.R")
+source("./scripts/PlotRNASeq/AllGenerics.R")
+source("./scripts/PlotRNASeq/methods-TranscriptExpressionSet.R")
+source("./scripts/PlotRNASeq/functions.R")

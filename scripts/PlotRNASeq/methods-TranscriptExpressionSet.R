@@ -165,9 +165,16 @@ setMethod(".plot_boxplots",
       list(c(0, 2, 0, 5)), 
       rep(list(c(0, 0, 0, 0)), nOfT))
 
+    # width
+    if (nOfT>3) {
+      width=(4+nOfT-1)
+    } else {
+      width=7
+    }
+
     # plot
     plot_count=0
-    pdf(file=outfile, width=(4+nOfT-1), height=6)
+    pdf(file=outfile, width=width, height=6)
       layout(t(1:(nOfT+3)), widths=c(0.5, rep(1, 2), rep(0.5, nOfT)))
       par(oma=c(13,0,2,0))
 
@@ -276,9 +283,16 @@ setMethod(".plot_segments",
       list(c(0, 2, 0, 5)), 
       rep(list(c(0, 0, 0, 0)), nOfT))
 
+    # width
+    if (nOfT>3) {
+      width=(4+nOfT-1)
+    } else {
+      width=7
+    }
+
     # plot
     plot_count=0
-    pdf(file=outfile, width=(4+nOfT-1), height=6)
+    pdf(file=outfile, width=width, height=6)
       layout(t(1:(nOfT+3)), widths=c(0.5, rep(1, 2), rep(0.5, nOfT)))
       par(oma=c(13,0,2,0))
 

@@ -1,19 +1,17 @@
 args=commandArgs(TRUE)
-gId=as.character(args[1])
-exp_data=as.character(args[2])
-annot=as.character(args[3])
-cond1=as.character(args[4])
-cond2=as.character(args[5])
-outdir=as.character(args[6])
+for(i in 1:length(args)){
+    eval(parse(text=args[[i]]))
+}
 
-# gId="ENSG00000180104"
-# expdata="/Users/mar/Desktop/app/2013.05.30_45pairs.dexseq2.txt"
+
+# gId="ENSG00000124193"
+# expdata="/Users/mar/github/lorem/test/test_data.txt"
 # annot="/Users/mar/Desktop/app/data_10/hsa/_ensembl66.annot_coding.1.txt"
-# cond1="3-45"
-# cond2="49-89"
-# outdir="/Users/mar/Desktop/app/html_12/"
+# cond1="3-6"
+# cond2="7-10"
+# outdir="./test"
 
-source("./PlotRNASeq/PlotRNASeq.R")
+source("./scripts/PlotRNASeq/PlotRNASeq.R")
 
 ## load data
 rpkms=readExpressionData(gId=gId, infile=expdata, cond1=cond1, cond2=cond2)
@@ -30,7 +28,7 @@ tes=newTranscriptExpressionSet(
 
 ## generate plots
 outfile=getOutfile(gId=gId, plot_type="starplots", outdir=outdir)
-plotStars(tes=tes, outfile="~/Desktop/test.stars.pdf")
+plotStars(tes=tes, outfile=outfile)
 
 outfile=getOutfile(gId=gId, plot_type="distrplots", outdir=outdir)
-plotDistr(tes=tes, outfile="~/Desktop/test.distr.pdf")
+plotDistr(tes=tes, outfile=outfile)

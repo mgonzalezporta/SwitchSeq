@@ -578,9 +578,13 @@ sub _print_html {
 
 	    	## generate plots
 	    	my $gId=$row[0];
-	    	my $command="Rscript ./scripts/generate_plots.R $arguments{'input'} $out_dir $data_dir $species $ensembl_v $cond1 $cond2 $gId";
-	    	#print $command;
-	    	#system($command);
+	    	my $expdata=$arguments{'input'};
+	    	my $annot=$data_dir."/".$species."/_ensembl".$ensembl_v.".annot_coding.1.txt";
+	    	my $command="R CMD BATCH ".
+	    		"\"--args gId='$gId' expdata='$expdata' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
+	    		"./scripts/generate_plots.R /dev/null";
+	    	print $command."\n";
+	    	system($command);
 
 	    	## classify switch events based on transcript biotype info
 		    my $tBiotype_A=$row[5];
