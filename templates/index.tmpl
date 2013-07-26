@@ -78,7 +78,9 @@
 							<tr>
 								<td>protein coding</td>
 								<td>protein coding</td>
-								<td><a href="pc_to_pc.html">{$count{'pc_to_pc'}}</a></td>
+								<!-- <td><a id="a1" value="pc_to_pc" href="#">{$count{'pc_to_pc'}}</a></td> -->
+								<td><a id="a1" onClick="filter='pc_pc'; return filter" href="#">
+									{$count{'pc_to_pc'}}</a></td>								
 							</tr>
 
 							<tr>
@@ -89,7 +91,7 @@
 							<tr>
 								<td>protein coding</td>
 								<td>nonsense mediated decay</td>
-								<td><a href="pc_to_nmd.html">{$count{'pc_to_nmd'}}</a></td>
+								<td><a id="a2" value="pc_to_nmd" href="#">{$count{'pc_to_nmd'}}</a></td>
 							</tr>
 							<tr>
 								<td>protein coding</td>

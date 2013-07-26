@@ -2,9 +2,84 @@
 //   -colnames
 //   -check sorting
 
+/* Custom filtering function which will filter data in column four between two values */
+$.fn.dataTableExt.afnFiltering.push(
+
+  function ( oSettings, aData, iDataIndex ) {
+    // document.getElementById("dynamic_filtering").innerHTML="Hello World";
+    // var filter = document.getElementById('dynamic_filtering').value;
+    // console.log(filter);
+
+  var filter = document.getElementById('a1').onClick;
+  // var a2 = document.getElementById('a2');
+
+  // var filter;
+  // a1.onclick = function() {
+  //   filter = "pc_pc";
+  //   return filter;
+  // };
+  // a2.onclick = function() {
+  //   filter = "pc_nmd";
+  //   alert(filter);
+  // };
+
+
+    // var filter = document.getElementById('dyn_filt').getAttribute("value");
+    console.log(filter);
+
+    // get filter info
+    var C1_filter;
+    var C2_filter;
+    if (filter == "pc_to_pc") {
+      C1_filter="protein_coding";
+      C2_filter="protein_coding";
+    }
+    if (filter == "pc_to_nmd") {
+      C1_filter="protein_coding";
+      C2_filter="nonsense_mediated_decay";
+    }
+
+    // row info
+    var C1_biotype = aData[5];
+    var C2_biotype = aData[11];
+
+    // filter rows
+    if ( C1_biotype == C1_filter && C2_biotype == C2_filter )
+    {
+      return true;
+    }
+    return false;
+  }
+
+);
+
+
+
+// function pc_to_pc() {
+
+//     $.fn.dataTableExt.afnFiltering.push(
+//       function( oSettings, aData, iDataIndex ) {
+//         var C1_biotype = aData[5];
+//         var C2_biotype = aData[11];
+
+//         // if ( C1_filter == C1_biotype && C2_filter == C2_biotype )
+//         if (C2_filter == "protein_coding")
+//         {
+//           return true;
+//         }
+//         return false;
+//       }
+//     );
+// }
+
+// function test(val) {
+//   var attr = val.attributes[1].name;
+//   alert(attr);
+// }
+
 /* Table initialisation */
 $(document).ready(function() {
-	$('#main').dataTable( {
+	var oTable = $('#main').dataTable( {
     "bProcessing": true,
     "aaData": data,
     "aoColumns": [
@@ -108,4 +183,20 @@ $(document).ready(function() {
     "aButtons": [ "print" ]
 		}
 	} );
+
+  /* Add event listeners to the two range filtering inputs */
+  $('#dyn_filt').keyup( function() { oTable.fnDraw(); } );
+  // $('#max').keyup( function() { oTable.fnDraw(); } );
+
 } );
+
+
+
+// $(document).ready(function() {
+//   /* Initialise datatables */
+//   var oTable = $('#example').dataTable();
+  
+//    Add event listeners to the two range filtering inputs 
+//   $('#min').keyup( function() { oTable.fnDraw(); } );
+//   $('#max').keyup( function() { oTable.fnDraw(); } );
+// } );
