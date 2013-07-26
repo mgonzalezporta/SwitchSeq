@@ -10,7 +10,7 @@ $.fn.dataTableExt.afnFiltering.push(
     // var filter = document.getElementById('dynamic_filtering').value;
     // console.log(filter);
 
-  var filter = document.getElementById('a1').onClick;
+  var filter = document.getElementById('a1');
   // var a2 = document.getElementById('a2');
 
   // var filter;
