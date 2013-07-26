@@ -273,6 +273,7 @@ sub _load_appris {
 }
 
 sub _get_header {
+	my $txt_output=$_[0];
 	my @header;
 
 	## general gene info
@@ -299,7 +300,11 @@ sub _get_header {
 	## general info again
 	push(@header, "pIdentity:percentage_identity_between_the_two_coding_sequences ");
 	push(@header, "pdbEntry:is_there_any_PDB_entry_available? ");
-	push(@header, "rank:ranking_to_maximise_expression_breadth\n");
+	if (!$txt_output) {
+		push(@header, "distrplot:link_to_distrplot");
+		push(@header, "starplot:link_to_starplot");	
+	}
+	push(@header, "rank:ranking_to_maximise_expression_breadth");
 
 	return(\@header);
 }
@@ -521,12 +526,12 @@ sub _print_txt {
 	my %switch=%$ref_switch;
 	my %arguments=%$ref_arguments;
 	my $out_dir=$arguments{'out_dir'};
-	my $out_file="$out_dir/switch.txt";
+	my $out_file="$out_dir/data/switch.txt";
 
 	## prepare output
 	open(my $fh, ">$out_file") or die "Could not open $out_file: $!";
-	my $ref_header=_get_header;
-	print $fh @$ref_header;
+	my $ref_header=_get_header(1);
+	print $fh "@$ref_header \n";
 
 	foreach my $gId (keys %switch) {
 		print $fh "$gId $switch{$gId}{'gName'} $switch{$gId}{'nOfT'} ";
@@ -575,119 +580,61 @@ sub _print_json {
 }
 
 sub _print_html {
-	## collect arguments
-	my $ref_switch=$_[0];
+	my $ref_switch=$_[0];	
 	my $ref_arguments=$_[1];
+
+	my %switch=%{$ref_switch};
 	my %arguments=%{$ref_arguments};
 	my $out_dir=$arguments{'out_dir'};
-	my $data_dir=$arguments{'data_dir'};
-	my $species=$arguments{'species'};
-	my $ensembl_v=$arguments{'ensembl_v'};
-	my $cond1=$arguments{'cond1'};
-	my $cond2=$arguments{'cond2'};
 
-	my $input="$out_dir/switch.txt";
-	my %data;
-	my %colnames_index;
-	my $total=0;
+	my $colnames=_get_header(0);
+	my %count=(
+		pc_to_pc => 0,
+		pc_to_nmd => 0,
+		pc_to_ri => 0,
+		pc_to_pt => 0,
+		nmd_to_pc => 0,
+		ri_to_pc => 0,
+		pt_to_pc => 0,
+		other => 0
+		);
 
-	## process switch.txt file
-	## create plots
-	open INPUT, $input or die "Could not open $input: $!";
-	while( my $row = <INPUT>)  {
-	    chomp($row);
-	    my @row=split(/\s+/, $row);
-
-	    if ($.==1) {
-	    	$data{'header'} = \@row;
-			push @{ $data{"header"} }, "boxplot:link_to_boxplot", "starplot:link_to_starplot";
-
-			my $n=@{ $data{'header'} };
-			for (my $i=0; $i<$n; $i++) {
-				my @id=split(/:/, ${ $data{'header'} }[$i]);
-				$colnames_index{$id[0]}=$i;
-			}
-
-	    } else {
-	    	$total++;
-
-	    	## generate plots
-	    	my $gId=$row[0];
-	    	my $expdata=$arguments{'input'};
-	    	my $annot=$data_dir."/".$species."/_ensembl".$ensembl_v.".annot_coding.1.txt";
-	    	my $command="R CMD BATCH --no-save ".
-	    		"\"--args bin='$Bin' gId='$gId' expdata='$expdata' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
-	    		"$Bin/scripts/generate_plots.R /dev/null";
-	    	# print $command."\n";
-	    	system($command);
-
-	    	## classify switch events based on transcript biotype info
-		    my $tBiotype_A=$row[5];
-		    my $tBiotype_B=$row[11];
-		    
-	    	if ($tBiotype_A eq 'protein_coding' and $tBiotype_B eq 'protein_coding') {
-	    		push @{$data{'pc_to_pc'}}, [ @row ] ;
-	    	} elsif ($tBiotype_A eq 'protein_coding' and $tBiotype_B eq 'nonsense_mediated_decay') {
-	    		push @{$data{'pc_to_nmd'}}, [ @row ];
-	    	} elsif ($tBiotype_A eq 'protein_coding' and $tBiotype_B eq 'retained_intron') {
-	    		push @{$data{'pc_to_ri'}}, [ @row ];
-	    	} elsif ($tBiotype_A eq 'protein_coding' and $tBiotype_B eq 'processed_transcript') {
-				push @{$data{'pc_to_pt'}}, [ @row ];
-			} elsif ($tBiotype_A eq 'nonsense_mediated_decay' and $tBiotype_B eq 'protein_coding') {
-				push @{$data{'nmd_to_pc'}}, [ @row ];
-			} elsif ($tBiotype_A eq 'retained_intron' and $tBiotype_B eq 'protein_coding') {
-				push @{$data{'ri_to_pc'}}, [ @row ];
-			} elsif ($tBiotype_A eq 'processed_transcript' and $tBiotype_B eq 'protein_coding') {
-				push @{$data{'pt_to_pc'}}, [ @row ];
-			} else {
-				push @{$data{'other'}}, [ @row ];
-			} 
-	    }
-	}
-	close INPUT;
-
-	## save summary statistics
-	my %count;
-	# my %count = (
-	# 	pc_to_pc => scalar( @{ $data{'pc_to_pc'} } ),
-	# 	pc_to_nmd => scalar( @{ $data{'pc_to_nmd'} } ),
-	# 	pc_to_ri => scalar( @{ $data{'pc_to_ri'} } ),
-	# 	pc_to_pt => scalar( @{ $data{'pc_to_pt'} } ),
-	# 	nmd_to_pc => scalar( @{ $data{'nmd_to_pc'} } ),
-	# 	ri_to_pc => scalar( @{ $data{'ri_to_pc'} } ),
-	# 	pt_to_pc => scalar( @{ $data{'pt_to_pc'} } ),
-	# 	other => scalar( @{ $data{'other'} } ),
-	# 	total => $total
-	# );
-
-	## output
-
-	## print subpages
-	## collect all data
-	my @all;
-	for my $comparison (keys %data) {
-		if ($comparison ne 'header') {
-			push @all, @{ $data{$comparison} };
-
-			my %to_template = (
-				info 			=> \%arguments,		# hash	
-				colnames 		=> $data{"header"},		# array
-				colnames_index 	=> \%colnames_index,	# hash
-				count 			=> \%count,				# hash
-				query 			=> $data{$comparison}	# array of arrays
-			);
-			my $outfile="$out_dir/$comparison.html";
-			_fill_template(\%to_template, $outfile);
+	foreach my $gId (keys %switch) {
+		if ($switch{$gId}{'C1.biotype'} eq 'protein_coding' 
+			and $switch{$gId}{'C2.biotype'} eq 'protein_coding') {
+			$count{'pc_to_pc'}++;
+		} elsif ($switch{$gId}{'C1.biotype'} eq 'protein_coding' 
+			and $switch{$gId}{'C2.biotype'} eq 'nonsense_mediated_decay') {
+			$count{'pc_to_nmd'}++;
+		} elsif ($switch{$gId}{'C1.biotype'} eq 'protein_coding' 
+			and $switch{$gId}{'C2.biotype'} eq 'retained_intron') {
+			$count{'pc_to_ri'}++;
+		} elsif ($switch{$gId}{'C1.biotype'} eq 'protein_coding' 
+			and $switch{$gId}{'C2.biotype'} eq 'processed_transcript') {
+			$count{'pc_to_pt'}++;
+		} elsif ($switch{$gId}{'C1.biotype'} eq 'nonsense_mediated_decay' 
+			and $switch{$gId}{'C2.biotype'} eq 'protein_coding') {
+			$count{'nmd_to_pc'}++;
+		} elsif ($switch{$gId}{'C1.biotype'} eq 'retained_intron' 
+			and $switch{$gId}{'C2.biotype'} eq 'protein_coding') {
+			$count{'ri_to_pc'}++;
+		} elsif ($switch{$gId}{'C1.biotype'} eq 'processed_transcript' 
+			and $switch{$gId}{'C2.biotype'} eq 'protein_coding') {
+			$count{'pt_to_pc'}++;
+		} else {
+			$count{'other'}++;
 		}
+	}
+
+	foreach my $category (keys %count) {
+		$count{'total'} += $count{$category};
 	}
 
 	## print index.html
 	my %to_template = (
-		info 			=> \%arguments,
-		colnames 		=> $data{"header"},
-		colnames_index 	=> \%colnames_index,
-		count 			=> \%count,
-		query 			=> \@all
+		info 	   => \%arguments,
+		colnames   => $colnames,
+		count 	   => \%count,
 	);
 	my $outfile="$out_dir/index.html";
 	_fill_template(\%to_template, $outfile);

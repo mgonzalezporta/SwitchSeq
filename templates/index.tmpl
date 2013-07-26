@@ -17,6 +17,7 @@
 <body>
 	<div class="container">
 		<div class="accordion" id="accordion_options">
+			<!-- INFO -->
 			<div class="accordion-group">
 				<div class="accordion-heading">
 				  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#info">
@@ -50,6 +51,7 @@
 			    </div>
 		  	</div>
 
+		  	<!-- FILTER -->
 			 <div class="accordion-group">
 			    <div class="accordion-heading">
 			      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#filter">
@@ -58,9 +60,8 @@
 			    </div>
 			    <div id="filter" class="accordion-body collapse">
 				    <div class="accordion-inner pagination-centered">
-
 						<p><b>Functional classification of switch events<br>
-							based on transcript biotype (C1, C2)</b></p>
+							based on transcript biotype information (C1, C2)</b></p>
 
 						<table class="table" id="toc">
 						<tbody>
@@ -132,6 +133,7 @@
 			    </div>
 			</div>
 
+			<!-- FORMAT -->
 		  	<div class="accordion-group">
 				<div class="accordion-heading">
 				  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#format">
@@ -155,69 +157,7 @@
 
 	<div class="table" id="big_container">
 		<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="main">
-	<!-- 	<thead>
-		  	<tr>
-		  		{
-					for my $i ( 0 .. $#colnames ) {
-						my @row = split(/:/, $colnames[$i]);
-						$OUT .= "<th>$row[0]</th>\n";
-					}
-				} 
-			</tr>
-		</thead>
-		<tbody>
-			{
-		  		for my $i ( 0 .. $#query ) {
-			  		$OUT .= "<tr>\n";
-			  		
-			  		# get relevant array indices
-			  		my $gId_index=$colnames_index{'gId'};
-			  		my $appris_index_c1=$colnames_index{'C1.principal'};
-			  		my $appris_index_c2=$colnames_index{'C2.principal'};
-			  		my $pIdentity_index=$colnames_index{'pIdentity'};
-			  		my $pdb_index=$colnames_index{'pdbEntry'};
-
-			  		my $gId=$query[$i][$gId_index];
-			  		my $subDir=substr($gId, 0, 12);
-
-			        for my $j ( 0 .. $#{$query[$i]} ) {
-			       		my $content=$query[$i][$j];
-
-			       		if ($j==$gId_index) {
-			       			my $url="http://www.ensembl.org/Homo_sapiens/Gene/Summary?g=$gId";
-			            	$OUT .= "\t<td><a href=$url>$gId</a></td>\n";
-
-		            	} elsif ($j==$appris_index_c1 || $j==$appris_index_c2) {
-		            		my $tId=$query[$i][$j-1];
-		            		my $url="http://appris.bioinfo.cnio.es/report.html?id=$tId&namespace=Ensembl_Transcript_Id";
-		            		$OUT .= "\t<td><a href=$url>$content</a></td>\n";
-
-	            		} elsif ($j==$pIdentity_index and $content ne "NA") {
-	            			my $url="$info{'out_dir'}/prot_aln/$subDir/$gId.needle_mod.out";
-	            			$OUT .= "<td><a href=$url>$content</a></td>";
-
-		            	} elsif ($j==$pdb_index and $content ne "NO") {
-		            		my $uniprotId=$content;
-		            		my $url="http://www.ebi.ac.uk/pdbe/widgets/unipdb?uniprot=$uniprotId";
-		            		$OUT .= "\t<td><a href=$url>YES</a></td>\n";
-
-		            	} else {
-		            		$OUT .= "\t<td>$content</td>\n";
-		            	}
-			        }
-
-				   	my $plot_dir="./plots";
-				    
-			  		my $url_boxplot="$plot_dir/boxplots/$subDir/$gId-rotated90.pdf";
-					$OUT .= "<td><a href=$url_boxplot>boxplot</a></td>";
-				
-					my $url_starplot="$plot_dir/starplots/$subDir/$gId.pdf";
-					$OUT .= "<td><a href=$url_starplot>starplot</a></td>";
-						        
-			    	$OUT .= "</tr>\n";
-			    }
-			}
-		</tbody> -->
+			<!-- will be filled in by javascript -->
 		</table>
 	</div>
 </body>
