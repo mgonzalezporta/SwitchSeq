@@ -10,7 +10,7 @@ for(i in 1:length(args)){
 # cond2="7-10"
 # outdir="./test"
 
-source(paste(bin, "/scripts/PlotRNASeq/PlotRNASeq.R", sep=""))
+source(paste(bin, "/scripts/PlotRNASeq/PlotRNASeq.R", sep=""), chdir=T)
 
 ## load data
 rpkms=readExpressionData(gId=gId, infile=expdata, cond1=cond1, cond2=cond2)

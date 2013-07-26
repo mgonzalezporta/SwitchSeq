@@ -30,6 +30,9 @@ sub get_switch {
 	my $threshold_gexp=$arguments{'threshold_gexp'};
 
 
+	## prepare dir structure
+	_prepare_dir_structure($ref_arguments);
+
 	## progress
 	print "# Obtaining and annotating alternative splicing switch events...\n";
 
@@ -50,6 +53,20 @@ sub get_switch {
 	my $count=keys %$ref_switch;
 	print "# Switch events obtained for $count protein coding genes.\n";
 
+}
+
+sub _prepare_dir_structure {
+	my $ref_arguments=$_[0];
+	my %arguments=%$ref_arguments;
+	my $out_dir=$arguments{'out_dir'};
+
+	unless ( -e $out_dir ) { system("mkdir $out_dir") };
+	unless ( -e "$out_dir/data" ) { system("mkdir $out_dir/data") };
+	unless ( -e  "$out_dir/data/prot_aln/" ) { system("mkdir $out_dir/data/prot_aln/") };
+	unless ( -e  "$out_dir/data/plots/" ) { system("mkdir $out_dir/data/plots/") };
+
+	system("cp -R $Bin/resources/css $out_dir");
+	system("cp -R $Bin/resources/js $out_dir");
 }
 
 sub _adjust_columns {
@@ -176,7 +193,6 @@ sub _obtain_switch_events {
 	my $species=$arguments{'species'};
 	my $ensembl_v=$arguments{'ensembl_v'};
 	my $out_dir=$arguments{'out_dir'};
-	unless (-e $out_dir) { system("mkdir $out_dir") };
 	my $output="$out_dir/switch.txt";
 	
 	## load data
@@ -410,8 +426,7 @@ sub _get_prot_identity {
 	my $tId_cond2=$subset_switch{'C2.tId'};
     my $fa_cond1="$data_dir/$species/_ensembl$ensembl_v.prot_seq/".substr($tId_cond1, 0, 12)."/$tId_cond1.fa";
     my $fa_cond2="$data_dir/$species/_ensembl$ensembl_v.prot_seq/".substr($tId_cond2, 0, 12)."/$tId_cond2.fa";
-   	my $outdir_aln="$out_dir/prot_aln/".substr($gId, 0, 12);
-   	unless ( -e  "$out_dir/prot_aln/" ) { system("mkdir $out_dir/prot_aln/") };
+   	my $outdir_aln="$out_dir/data/prot_aln/".substr($gId, 0, 12);
    	unless ( -e  $outdir_aln ) { system("mkdir $outdir_aln") };
    	my $out_aln="$outdir_aln/$gId.needle_mod.out";
    	my $pIdentity="NA";
@@ -600,10 +615,10 @@ sub _print_html {
 	    	my $gId=$row[0];
 	    	my $expdata=$arguments{'input'};
 	    	my $annot=$data_dir."/".$species."/_ensembl".$ensembl_v.".annot_coding.1.txt";
-	    	my $command="R CMD BATCH ".
+	    	my $command="R CMD BATCH --no-save ".
 	    		"\"--args bin='$Bin' gId='$gId' expdata='$expdata' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
-	    		"$Bin/scripts/generate_plots.R $gId.out";
-	    	print $command."\n";
+	    		"$Bin/scripts/generate_plots.R /dev/null";
+	    	# print $command."\n";
 	    	system($command);
 
 	    	## classify switch events based on transcript biotype info
@@ -676,10 +691,6 @@ sub _print_html {
 	);
 	my $outfile="$out_dir/index.html";
 	_fill_template(\%to_template, $outfile);
-
-	## copy css + js
-	system("cp -R $Bin/resources/css $out_dir");
-	system("cp -R $Bin/resources/js $out_dir");
 }
 
 sub _fill_template {

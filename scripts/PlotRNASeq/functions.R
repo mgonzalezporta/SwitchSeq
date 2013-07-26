@@ -48,7 +48,7 @@ newTranscriptExpressionSet=function(gId=gId, rpkms=rpkms, biotypes=biotypes, con
 
 getOutfile=function(outdir=outdir, plot_type=plot_type, gId=gId) {
   # create plots directory
-  outdir_plots=paste(outdir, "/plots", sep="")
+  outdir_plots=paste(outdir, "/data/plots", sep="")
   dir.create(outdir_plots, showWarnings = FALSE)
 
   # create plot type directory
