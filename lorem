@@ -112,7 +112,7 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 			 -e "$arguments{'data_dir'}/$arguments{'species'}" ) {
 				my $message="Cannot find data directory:\n".
 							"   $arguments{'data_dir'}/$arguments{'species'}\n".
-							"Obtain data first: lorem -t get_data -h\n";
+							"Data should be downloaded first: lorem -t get_data -h\n";
 				die $message;
 	}
 	

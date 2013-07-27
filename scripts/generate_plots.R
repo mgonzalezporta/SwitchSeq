@@ -3,13 +3,6 @@ for(i in 1:length(args)){
     eval(parse(text=args[[i]]))
 }
 
-# gId="ENSG00000124193"
-# expdata="/Users/mar/github/lorem/test/test_data.txt"
-# annot="/Users/mar/Desktop/app/data_10/hsa/_ensembl66.annot_coding.1.txt"
-# cond1="3-6"
-# cond2="7-10"
-# outdir="./test"
-
 source(paste(bin, "/scripts/PlotRNASeq/PlotRNASeq.R", sep=""), chdir=T)
 
 ## load data

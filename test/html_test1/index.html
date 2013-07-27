@@ -27,7 +27,7 @@
 			    <div id="info" class="accordion-body collapse">
 				    <div class="accordion-inner">
 				    	<p><b>Input:</b> ./data_test1/expdata.txt</p>
-				    	<p><b>Data directory:</b> /Users/mar/Desktop/app/data_10</p>
+				    	<p><b>Data directory:</b> /Users/aliquota/Desktop/data</p>
 				    	<p><b>Species:</b> hsa</p>
 				    	<p><b>Ensembl version:</b> 66</p>
 				    	<p><b>Condition 1:</b> 
@@ -60,7 +60,7 @@
 							<tr>
 								<td><b>All</></td>
 								<td></td>
-								<td><a href="index.html">2</a></td>
+								<td><a href="#">2</a></td>
 							</tr>
 							<tr>
 								<td><b>Protein coding</b></td>
@@ -70,8 +70,7 @@
 							<tr>
 								<td>protein coding</td>
 								<td>protein coding</td>
-								<!-- <td><a id="a1" value="pc_to_pc" href="#">1</a></td> -->
-								<td><a id="a1" onClick="return 'pc_to_pc'" href="#">
+								<td><a onClick="updateTable('pc_to_pc')" href="#">
 									1</a></td>								
 							</tr>
 
@@ -83,17 +82,20 @@
 							<tr>
 								<td>protein coding</td>
 								<td>nonsense mediated decay</td>
-								<td><a id="a2" value="pc_to_nmd" href="#">1</a></td>
+								<td><a onClick="updateTable('pc_to_nmd')" href="#">
+									1</a></td>
 							</tr>
 							<tr>
 								<td>protein coding</td>
 								<td>retained intron</td>
-								<td><a href="pc_to_ri.html">0</a></td>
+								<td><a onClick="updateTable('pc_to_ri')" href="#">
+									0</a></td>								
 							</tr>
 							<tr>
 								<td>protein coding</td>
 								<td>processed transcript</td>
-								<td><a href="pc_to_pt.html">0</a></td>
+								<td><a onClick="updateTable('pc_to_pt')" href="#">
+									0</a></td>								
 							</tr>
 
 							<tr>
@@ -104,21 +106,25 @@
 							<tr>
 								<td>nonsense mediated decay</td>
 								<td>protein coding</td>
-								<td><a href="nmd_to_pc.html">0</a></td>
+								<td><a onClick="updateTable('nmd_to_pc')" href="#">
+									0</a></td>								
 							</tr>
 							<tr>
 								<td>retained intron</td>
 								<td>protein coding</td>
-								<td><a href="ri_to_pc.html">0</a></td>
+								<td><a onClick="updateTable('ri_to_pc')" href="#">
+									0</a></td>								
 							</tr>
 								<tr><td>processed transcript</td>
 								<td>protein coding</td>
-								<td><a href="pt_to_pc.html">0</a></td>
+								<td><a onClick="updateTable('pt_to_pc')" href="#">
+									0</a></td>								
 							</tr>
 							<tr>
 								<td><b>Other</b></td>
 								<td></td>
-								<td><a href="other.html">0</a>
+								<td><a onClick="updateTable('other')" href="#">
+									0</a></td>									
 								</td>
 							</tr>
 						</tbody>
