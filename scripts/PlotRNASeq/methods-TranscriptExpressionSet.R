@@ -167,7 +167,8 @@ setMethod(".plot_boxplots",
 
     # width
     if (nOfT>3) {
-      width=(4+nOfT-1)
+      #width=(4+nOfT-1)
+      width=4+nOfT
     } else {
       width=7
     }
@@ -285,7 +286,8 @@ setMethod(".plot_segments",
 
     # width
     if (nOfT>3) {
-      width=(4+nOfT-1)
+      #width=(4+nOfT-1)
+      width=4+nOfT
     } else {
       width=7
     }

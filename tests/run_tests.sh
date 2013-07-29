@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ## test1: get_switch - 4+4 samples
+echo "Running test 1..."
 lorem -t get_switch \
 	-s hsa -e 66 \
 	-d /Users/aliquota/Desktop/data \
@@ -12,6 +13,7 @@ lorem -t get_switch \
 # -d /Users/aliquota/Desktop/data \
 
 ## test2: get_switch - 12+12 samples
+echo "Running test 2..."
 lorem -t get_switch \
 	-s hsa -e 66 \
 	-d /Users/aliquota/Desktop/data \

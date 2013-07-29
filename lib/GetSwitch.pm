@@ -621,6 +621,19 @@ sub _print_html {
 		} else {
 			$count{'other'}++;
 		}
+
+		## generate plots
+		my $expdata=$arguments{'input'};
+		my $annot=$arguments{'data_dir'}."/".
+			$arguments{'species'}."/_ensembl".$arguments{'ensembl_v'}
+			.".annot_coding.1.txt";
+		my $cond1=$arguments{'cond1'};
+		my $cond2=$arguments{'cond2'};
+		my $command="R CMD BATCH --no-save ".
+		  "\"--args bin='$Bin' gId='$gId' expdata='$expdata' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
+		  "$Bin/scripts/generate_plots.R /dev/null";
+		#print $command."\n";
+		system($command);
 	}
 
 	foreach my $category (keys %count) {
