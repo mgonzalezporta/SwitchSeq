@@ -258,7 +258,7 @@ sub _load_appris {
     open (INPUT, "<$appris_input") or die "Could not open $appris_input: $!";
     while( my $row = <INPUT>)  {
     	chomp ($row);
-    	my @row=split(/\t/, $row);
+    	my @row=split(/\s+/, $row);
 
     	if ($row[5] eq 'PRINCIPAL') {
     		$appris{$row[2]}++;
