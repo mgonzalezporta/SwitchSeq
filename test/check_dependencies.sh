@@ -1,10 +1,16 @@
 #!/bin/bash
 
-#needle
-
 checkPerlModule() {
     perl -M$1 -e '' > /dev/null 2>&1
     if [ $? -eq 0 ]; then
+        echo "   $1 - OK"
+    else
+        echo "   $1 - NOT FOUND"
+    fi
+}
+
+checkBin() {
+    if hash $1 2>/dev/null; then
         echo "   $1 - OK"
     else
         echo "   $1 - NOT FOUND"
@@ -19,3 +25,6 @@ for m in "${modules[@]}"
 do
 	checkPerlModule $m
 done
+
+echo "# Checking needle installation..."
+checkBin needle
