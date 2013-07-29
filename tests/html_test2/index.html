@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<title>Switch events</title>
+	<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="./css/DT_bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="./css/TableTools.css">
+
+	<script type="text/javascript" language="javascript" src="./js/jquery.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/TableTools.min.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/bootstrap.min.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/DT_bootstrap.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/data.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/table_initialisation.js"></script>
+</head>
+<body>
+	<div class="container">
+		<div class="accordion" id="accordion_options">
+			<!-- INFO -->
+			<div class="accordion-group">
+				<div class="accordion-heading">
+				  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#info">
+				    <b>Execution information</b>
+				  </a>
+				</div>
+			    <div id="info" class="accordion-body collapse">
+				    <div class="accordion-inner">
+				    	<p><b>Input:</b> ./data_test2/expdata.txt</p>
+				    	<p><b>Data directory:</b> ./data_annot</p>
+				    	<p><b>Species:</b> hsa</p>
+				    	<p><b>Ensembl version:</b> 66</p>
+				    	<p><b>Condition 1:</b> 
+				    		columns 3-14,
+				    		12 samples
+				    	</p>
+				    	<p><b>Condition 2:</b> 
+				    		columns 15-26,
+				    		12 samples
+				    	</p>
+				 
+				    </div>
+			    </div>
+		  	</div>
+
+		  	<!-- FILTER -->
+			 <div class="accordion-group">
+			    <div class="accordion-heading">
+			      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#filter">
+			        <b>1. Filter</b>
+			      </a>
+			    </div>
+			    <div id="filter" class="accordion-body collapse">
+				    <div class="accordion-inner pagination-centered">
+						<p><b>Functional classification of switch events<br>
+							based on transcript biotype information (C1, C2)</b></p>
+
+						<table class="table" id="toc">
+						<tbody>
+							<tr>
+								<td><b>All</></td>
+								<td></td>
+								<td><a href="#">3</a></td>
+							</tr>
+							<tr>
+								<td><b>Protein coding</b></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>protein coding</td>
+								<td>protein coding</td>
+								<td><a onClick="updateTable('pc_to_pc')" href="#">
+									2</a></td>								
+							</tr>
+
+							<tr>
+								<td><b>Potential function loss</b></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>protein coding</td>
+								<td>nonsense mediated decay</td>
+								<td><a onClick="updateTable('pc_to_nmd')" href="#">
+									1</a></td>
+							</tr>
+							<tr>
+								<td>protein coding</td>
+								<td>retained intron</td>
+								<td><a onClick="updateTable('pc_to_ri')" href="#">
+									0</a></td>								
+							</tr>
+							<tr>
+								<td>protein coding</td>
+								<td>processed transcript</td>
+								<td><a onClick="updateTable('pc_to_pt')" href="#">
+									0</a></td>								
+							</tr>
+
+							<tr>
+								<td><b>Potential function gain</b></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>nonsense mediated decay</td>
+								<td>protein coding</td>
+								<td><a onClick="updateTable('nmd_to_pc')" href="#">
+									0</a></td>								
+							</tr>
+							<tr>
+								<td>retained intron</td>
+								<td>protein coding</td>
+								<td><a onClick="updateTable('ri_to_pc')" href="#">
+									0</a></td>								
+							</tr>
+								<tr><td>processed transcript</td>
+								<td>protein coding</td>
+								<td><a onClick="updateTable('pt_to_pc')" href="#">
+									0</a></td>								
+							</tr>
+							<tr>
+								<td><b>Other</b></td>
+								<td></td>
+								<td><a onClick="updateTable('other')" href="#">
+									0</a></td>									
+								</td>
+							</tr>
+						</tbody>
+						</table>
+					</div>
+			    </div>
+			</div>
+
+			<!-- FORMAT -->
+		  	<div class="accordion-group">
+				<div class="accordion-heading">
+				  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_options" href="#format">
+				    <b>2. Format</b>
+				  </a>
+				</div>
+			    <div id="format" class="accordion-body collapse">
+				    <div class="accordion-inner">
+					<a href="javascript:void(0);" onclick="fnShowHide(0);"><input type="checkbox" checked /></a> <b>gId</b>: ensembl gene id <br><a href="javascript:void(0);" onclick="fnShowHide(1);"><input type="checkbox" checked /></a> <b>gName</b>: gene name <br><a href="javascript:void(0);" onclick="fnShowHide(2);"><input type="checkbox" checked /></a> <b>nOfT</b>: number of annotated transcripts <br><a href="javascript:void(0);" onclick="fnShowHide(3);"><input type="checkbox" checked /></a> <b>C1.tId</b>: major transcript - condition 1 <br><a href="javascript:void(0);" onclick="fnShowHide(4);"><input type="checkbox" checked /></a> <b>C1.principal</b>: is the transcript classified as principal in APPRIS? - condition 1 <br><a href="javascript:void(0);" onclick="fnShowHide(5);"><input type="checkbox" checked /></a> <b>C1.biotype</b>: major transcript biotype - condition 1 <br><a href="javascript:void(0);" onclick="fnShowHide(6);"><input type="checkbox" checked /></a> <b>C1.tExp</b>: in how many samples is the transcript detected as major? - condition 1 <br><a href="javascript:void(0);" onclick="fnShowHide(7);"><input type="checkbox" checked /></a> <b>C1.gExp</b>: in how many samples is the gene expressed? - condition 1 <br><a href="javascript:void(0);" onclick="fnShowHide(8);"><input type="checkbox" checked /></a> <b>C1.breadth</b>: major transcript expression breadth - condition 1 <br><a href="javascript:void(0);" onclick="fnShowHide(9);"><input type="checkbox" checked /></a> <b>C2.tId</b>: major transcript - condition 2 <br><a href="javascript:void(0);" onclick="fnShowHide(10);"><input type="checkbox" checked /></a> <b>C2.principal</b>: is the transcript classified as principal in APPRIS? - condition 2 <br><a href="javascript:void(0);" onclick="fnShowHide(11);"><input type="checkbox" checked /></a> <b>C2.biotype</b>: major transcript biotype - condition 2 <br><a href="javascript:void(0);" onclick="fnShowHide(12);"><input type="checkbox" checked /></a> <b>C2.tExp</b>: in how many samples is the transcript detected as major? - condition 2 <br><a href="javascript:void(0);" onclick="fnShowHide(13);"><input type="checkbox" checked /></a> <b>C2.gExp</b>: in how many samples is the gene expressed? - condition 2 <br><a href="javascript:void(0);" onclick="fnShowHide(14);"><input type="checkbox" checked /></a> <b>C2.breadth</b>: major transcript expression breadth - condition 2 <br><a href="javascript:void(0);" onclick="fnShowHide(15);"><input type="checkbox" checked /></a> <b>pIdentity</b>: percentage identity between the two coding sequences <br><a href="javascript:void(0);" onclick="fnShowHide(16);"><input type="checkbox" checked /></a> <b>pdbEntry</b>: is there any PDB entry available? <br><a href="javascript:void(0);" onclick="fnShowHide(17);"><input type="checkbox" checked /></a> <b>distrplot</b>: link to distrplot<br><a href="javascript:void(0);" onclick="fnShowHide(18);"><input type="checkbox" checked /></a> <b>starplot</b>: link to starplot<br><a href="javascript:void(0);" onclick="fnShowHide(19);"><input type="checkbox" checked /></a> <b>rank</b>: ranking to maximise expression breadth<br>
+				    </div>
+			    </div>
+			</div>
+		</div>
+	</div>
+
+	<div class="table" id="big_container">
+		<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="main">
+			<!-- will be filled in by javascript -->
+		</table>
+	</div>
+</body>
+</html>
