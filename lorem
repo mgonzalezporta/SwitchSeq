@@ -33,7 +33,7 @@ GetOptions(
     'cond2|c2=s',
     'threshold_gexp|g=f'
 ) or die pod2usage(
-	-input => "$Bin/doc/pod/lorem.pod",
+	-input => "$Bin/doc/lorem.pod",
 	-verbose => 1
 );
 
@@ -45,7 +45,7 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 		!defined($arguments{'ensembl_v'})) {
 		
 		die pod2usage(
-			-input => "$Bin/doc/pod/get_data.pod",
+			-input => "$Bin/doc/get_data.pod",
 			-verbose => 1
 		);
 	}
@@ -70,7 +70,7 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 		!defined($arguments{'cond2'})) {
 
 		die pod2usage(
-			-input => "$Bin/doc/pod/get_switch.pod",
+			-input => "$Bin/doc/get_switch.pod",
 			-verbose => 1
 		);	
 	}
@@ -122,14 +122,14 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 } elsif ($arguments{'help'}) {
 	## print doc - long version
 	die pod2usage(
-		-input => "$Bin/doc/pod/lorem.pod",
+		-input => "$Bin/doc/lorem.pod",
 		-verbose => 99,
 	    -sections => "NAME|VERSION|SYNOPSIS|OPTIONS" );
 
 } else {
 	## print doc - short version
 	die pod2usage(
-		-input => "$Bin/doc/pod/lorem.pod",
+		-input => "$Bin/doc/lorem.pod",
 		-verbose => 1
 	);
 }
