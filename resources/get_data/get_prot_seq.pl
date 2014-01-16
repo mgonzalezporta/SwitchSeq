@@ -59,7 +59,8 @@ foreach my $slice ( @{ $slices } ) {
 				my $tBiotype=$transcript->biotype();
 
     				if ($tBiotype eq "protein_coding") {
-    					my $fa_subdir=$fa_dir.substr($tId, 0, 12);
+					my ($species_id, $numeric_id) = $tId =~ /([a-zA-Z]+)(\d+)/; 
+    					my $fa_subdir=$fa_dir.$species_id.substr($numeric_id, 0, 8);
     					unless (-e $fa_subdir) { system("mkdir $fa_subdir") };
         				my $out_fa="$fa_subdir/$tId.fa";
         				my $seq=$transcript->translate()->seq();
