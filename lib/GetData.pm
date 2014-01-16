@@ -27,8 +27,8 @@ sub get_data {
 	## define urls
 	## by default, work with the latest version of APPRIS
 	my %url=(
-		ensembl_1   => "http://www.ebi.ac.uk/~mar/tools/lorem/$species.$ensembl_v/annot_coding.1.txt",
-		ensembl_2   => "http://www.ebi.ac.uk/~mar/tools/lorem/$species.$ensembl_v/annot_coding.2.txt",
+		ensembl_1   => "http://www.ebi.ac.uk/~mar/tools/lorem/$species.$ensembl_v/ensembl1.txt",
+		ensembl_2   => "http://www.ebi.ac.uk/~mar/tools/lorem/$species.$ensembl_v/ensembl2.txt",
 		prot_seq    => "http://www.ebi.ac.uk/~mar/tools/lorem/$species.$ensembl_v/prot_seq.tar.gz",
 		appris      => "http://appris.bioinfo.cnio.es/download/data/$species_full{$species}/appris_data.principal.txt",
 	);
