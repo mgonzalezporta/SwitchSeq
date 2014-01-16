@@ -26,6 +26,8 @@ sub get_switch {
 	my $cond2=$arguments{'cond2'};
 	my $threshold_gexp=$arguments{'threshold_gexp'};
 
+	## check if data files are present
+	
 	## prepare dir structure
 	_prepare_dir_structure($ref_arguments);
 
@@ -420,9 +422,13 @@ sub _get_prot_identity {
 	my %subset_switch=%$ref_subset_switch;
 	my $tId_cond1=$subset_switch{'C1.tId'};
 	my $tId_cond2=$subset_switch{'C2.tId'};
-    my $fa_cond1="$data_dir/$species/_ensembl$ensembl_v.prot_seq/".substr($tId_cond1, 0, 12)."/$tId_cond1.fa";
-    my $fa_cond2="$data_dir/$species/_ensembl$ensembl_v.prot_seq/".substr($tId_cond2, 0, 12)."/$tId_cond2.fa";
-   	my $outdir_aln="$out_dir/data/prot_aln/".substr($gId, 0, 12);
+        my ($species_id_cond1, $numeric_id_cond1) = $tId_cond1 =~ /([a-zA-Z]+)(\d+)/;
+	my $fa_cond1="$data_dir/$species.$ensembl_v/prot_seq/".$species_id_cond1.substr($numeric_id_cond1, 0, 8)."/$tId_cond1.fa";
+	my ($species_id_cond2, $numeric_id_cond2) = $tId_cond2 =~ /([a-zA-Z]+)(\d+)/;
+        my $fa_cond2="$data_dir/$species.$ensembl_v/prot_seq/".$species_id_cond2.substr($numeric_id_cond2, 0, 8)."/$tId_cond2.fa";
+
+	my ($species_id, $numeric_id) = $gId =~ /([a-zA-Z]+)(\d+)/;
+   	my $outdir_aln="$out_dir/data/prot_aln/".$species_id.substr($numeric_id, 0, 8);
    	unless ( -e  $outdir_aln ) { system("mkdir $outdir_aln") };
    	my $out_aln="$outdir_aln/$gId.needle_mod.out";
    	my $pIdentity="NA";

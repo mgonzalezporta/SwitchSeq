@@ -39,4 +39,4 @@ then
 fi
 
 perl get_prot_seq.pl $ensembl_v $species $outdir
-tar czf $outdir/prot_seq.tar.gz $outdir/prot_seq/
+cd $outdir && tar czf prot_seq.tar.gz prot_seq/
