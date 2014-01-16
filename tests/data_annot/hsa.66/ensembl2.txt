@@ -1,0 +1,2 @@
+gene_id uniprot_id
+ENSG00000153086 Q8TDX5
