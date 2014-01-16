@@ -51,10 +51,14 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 		);
 	}
 
-	## only support hsa - temporary
-	unless ($arguments{'species'} eq "hsa") {
-		my $message="Sorry, only human supported for now.\n".
-					"Print help: lorem -tool get_data -h\n";
+	## check for species
+	unless ($arguments{'species'} eq "hsa" 
+		or $arguments{'species'} eq "mmu"
+		or $arguments{'species'} eq "dre"
+		or $arguments{'species'} eq "rno") {
+		my $message="Pre-compiled data available only for human (hsa), mouse (mmu), rat (rno) and zebrafish (dre).\n".
+				"Refer to the project's wiki for further information on how to proceed with other species:\n".
+				"\thttps://github.com/mgonzalezporta/lorem/wiki/Tutorial\n";
 		die $message;
 	}
 
@@ -74,13 +78,6 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 			-input => "$Bin/doc/get_switch.pod",
 			-verbose => 1
 		);	
-	}
-
-	## only support hsa - temporary
-	unless ($arguments{'species'} eq "hsa") {
-		my $message="Sorry, only human supported for now.\n".
-					"Print help: lorem -tool get_data -h\n";
-		die $message;
 	}
 
 	## check input arguments
