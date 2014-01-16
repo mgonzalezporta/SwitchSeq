@@ -26,7 +26,6 @@ sub get_switch {
 	my $cond2=$arguments{'cond2'};
 	my $threshold_gexp=$arguments{'threshold_gexp'};
 
-
 	## prepare dir structure
 	_prepare_dir_structure($ref_arguments);
 
@@ -111,15 +110,12 @@ sub _obtain_major_tx {
 		}
 	}
 	close (INPUT);
-	# TO DO: what if they are the same?
-	# /homes/mar/home_microarray/workspace/cagekid/scripts/plots/mar_v5/fig3.switch_v2.R
 
 	return \%major_tx;
 }
 
 sub _obtain_recurrent_major_tx {
 	## obtain the most recurrent major transcripts in each condition
-	
 	my $ref_major_tx=$_[0];
 	my $ref_arguments=$_[1];
 
@@ -193,12 +189,12 @@ sub _obtain_switch_events {
 	my $output="$out_dir/switch.txt";
 	
 	## load data
-	my $ensembl_input="$data_dir/$species/_ensembl$ensembl_v.annot_coding.1.txt";
-	my $pdb_input="$data_dir/$species/_ensembl$ensembl_v.annot_coding.2.txt";
-	my $ref_ensembl=_load_ensembl($ensembl_input, $pdb_input);
+	my $ensembl_input1="$data_dir/$species.$ensembl_v/ensembl1.txt";
+	my $ensembl_input2="$data_dir/$species.$ensembl_v/ensembl2.txt";
+	my $ref_ensembl=_load_ensembl($ensembl_input1, $ensembl_input2);
 	#print Dumper %$ref_ensembl;
 
-	my $appris_input="$data_dir/$species/_appris.results.rel15.9Jun2013.v2.main.tsv";
+	my $appris_input="$data_dir/$species.$ensembl_v/appris_data.principal.txt";
 	my $ref_appris=_load_appris($appris_input);
 
 	## find and annotate
@@ -209,12 +205,12 @@ sub _obtain_switch_events {
 }
 
 sub _load_ensembl {
-	my $ensembl_input=$_[0];
-	my $pdb_input=$_[1];
+	my $ensembl_input1=$_[0];
+	my $ensembl_input2=$_[1];
 	
 	my %ensembl;
 
-	open (INPUT, "< $ensembl_input") or die "Could not open $ensembl_input: $!";
+	open (INPUT, "< $ensembl_input1") or die "Could not open $ensembl_input1: $!";
 	while( my $row = <INPUT>)  {
 		chomp ($row);
 
@@ -233,7 +229,7 @@ sub _load_ensembl {
 	}
 	close (INPUT);
 
-	open (INPUT, "<$pdb_input") or die "Could not open $pdb_input: $!";
+	open (INPUT, "<$ensembl_input2") or die "Could not open $ensembl_input2: $!";
 	while( my $row = <INPUT>)  {
 		chomp ($row);
 
@@ -255,18 +251,16 @@ sub _load_appris {
 
 	my %appris;
 
-    open (INPUT, "<$appris_input") or die "Could not open $appris_input: $!";
-    while( my $row = <INPUT>)  {
-    	chomp ($row);
-    	my @row=split(/\s+/, $row);
-
-    	if ($row[5] eq 'PRINCIPAL') {
-    		$appris{$row[2]}++;
-    	}
-    }
-    close (INPUT);
-
-    return \%appris;
+        open (INPUT, "<$appris_input") or die "Could not open $appris_input: $!";
+        while( my $row = <INPUT>)  {
+        	chomp ($row);
+        	my @row=split(/\s+/, $row);
+    
+		$appris{$row[2]}++;
+        }
+        close (INPUT);
+    
+        return \%appris;
 }
 
 sub _get_header {
