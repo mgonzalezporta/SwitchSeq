@@ -16,7 +16,7 @@ in_xml=ensembl1.xml
 out=$outdir/ensembl1.txt
 
 echo "gene_id gene_name number_of_transcripts transcript_id transcript_biotype" > $out
-#perl query_biomart.pl $in_xml $species $path >> $out
+perl query_biomart.pl $in_xml $species $path >> $out
 
 ## ensembl2
 echo "Creating ensembl2.txt..."
@@ -24,7 +24,7 @@ in_xml=ensembl2.xml
 out=$outdir/ensembl2.txt
 
 echo "gene_id uniprot_id" > $out
-#perl query_biomart.pl $in_xml $species $path | grep -E '^[[:alnum:]]+\s[[:alnum:]]+' >> $out
+perl query_biomart.pl $in_xml $species $path | grep -E '^[[:alnum:]]+\s[[:alnum:]]+' >> $out
 
 ## protein sequences
 echo "Retrieving protein sequences..."
