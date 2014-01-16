@@ -1,9 +1,9 @@
 ########################################
 # Program: needle
-# Rundate: Mon 29 Jul 2013 21:40:41
+# Rundate: Thu 16 Jan 2014 17:32:42
 # Commandline: needle
-#    [-asequence] ./data_annot/hsa/_ensembl66.prot_seq/ENST00000356/ENST00000356140.fa
-#    [-bsequence] ./data_annot/hsa/_ensembl66.prot_seq/ENST00000392/ENST00000392928.fa
+#    [-asequence] ./data_annot/hsa.66/prot_seq/ENST00000356/ENST00000356140.fa
+#    [-bsequence] ./data_annot/hsa.66/prot_seq/ENST00000392/ENST00000392928.fa
 #    -auto
 #    [-outfile] stdout
 # Align_format: srspair

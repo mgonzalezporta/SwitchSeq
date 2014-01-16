@@ -26,8 +26,6 @@ sub get_switch {
 	my $cond2=$arguments{'cond2'};
 	my $threshold_gexp=$arguments{'threshold_gexp'};
 
-	## check if data files are present
-	
 	## prepare dir structure
 	_prepare_dir_structure($ref_arguments);
 

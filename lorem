@@ -106,10 +106,12 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 	}
 
 	unless ( -e $arguments{'data_dir'} and 
-			 -e "$arguments{'data_dir'}/$arguments{'species'}" ) {
+			 -e "$arguments{'data_dir'}/$arguments{'species'}.$arguments{'ensembl_v'}" ) {
 				my $message="Cannot find data directory:\n".
-							"   $arguments{'data_dir'}/$arguments{'species'}\n".
-							"Data should be downloaded first: lorem -t get_data -h\n";
+							"   $arguments{'data_dir'}/$arguments{'species'}.$arguments{'ensembl_v'}\n".
+							"Data should be downloaded first:\n".
+							"\tlorem -t get_data -h\n".
+							"\thttps://github.com/mgonzalezporta/lorem/wiki/Tutorial\n";
 				die $message;
 	}
 	
