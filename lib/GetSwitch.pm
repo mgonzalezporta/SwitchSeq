@@ -256,10 +256,10 @@ sub _load_appris {
         	chomp ($row);
         	my @row=split(/\s+/, $row);
     
-		$appris{$row[2]}++;
+		$appris{$row[1]}++;
         }
         close (INPUT);
-    
+   
         return \%appris;
 }
 
