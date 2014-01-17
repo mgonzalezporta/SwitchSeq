@@ -20,6 +20,9 @@ setGeneric("dominance",
 setGeneric("biotypes", 
 	function(object) standardGeneric("biotypes"))
 
+setGeneric("significant_events",
+        function(object) standardGeneric("significant_events"))
+
 ## plots
 setGeneric("plotStars", 
 	function(tes, outfile) standardGeneric("plotStars"))
@@ -62,4 +65,4 @@ setGeneric(".subplot_segments",
 	function(data1=data1, data2=data2, xlab=xlab, ylab=ylab, type=type, mar=mar, col=col, plot_count=plot_count) standardGeneric(".subplot_segments"))
 
 setGeneric(".annotate_data", 
-	function(data=data, biotypes=biotypes) standardGeneric(".annotate_data"))
+	function(data=data, significant_events=significant_events, biotypes=biotypes) standardGeneric(".annotate_data"))

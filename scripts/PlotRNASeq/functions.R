@@ -26,7 +26,15 @@ readBiotypeData=function(gId=gId, infile=infile) {
   return(tBiotype)
 }
 
-newTranscriptExpressionSet=function(gId=gId, rpkms=rpkms, biotypes=biotypes, cond1=cond1, cond2=cond2) {
+readSignificantEvents=function(gId=gId, infile=significant_events) {
+  # significant events, if any
+  command=paste("grep", gId, infile, sep=" ")
+  significant_events=as.character(read.table(pipe(command))[,2])
+
+  return(significant_events)
+}
+
+newTranscriptExpressionSet=function(gId=gId, rpkms=rpkms, biotypes=biotypes, cond1=cond1, cond2=cond2, significant_events=significant_events) {
   # conditions
   cond1=.format_cond(cond1)
   cond2=.format_cond(cond2)
@@ -40,7 +48,8 @@ newTranscriptExpressionSet=function(gId=gId, rpkms=rpkms, biotypes=biotypes, con
     id=gId,
     conditions=conditions,
     rpkms=rpkms,
-    biotypes=biotypes
+    biotypes=biotypes,
+    significant_events=significant_events
   )
 
   return(tes)

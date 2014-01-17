@@ -1,6 +1,6 @@
 ## initialize
 setMethod("initialize", "TranscriptExpressionSet",
-  function(.Object, id=id, rpkms=rpkms, biotypes=biotypes, conditions=conditions){
+  function(.Object, id=id, rpkms=rpkms, biotypes=biotypes, conditions=conditions, significant_events=significant_events){
     .Object@id=id
     .Object@rpkms=rpkms
     .Object@conditions=conditions
@@ -10,6 +10,7 @@ setMethod("initialize", "TranscriptExpressionSet",
     .Object@.scaledexp=.calculate_scaledexp(.Object)
     .Object@biotypes=biotypes
     .Object@.cols=.get_transcript_colors(.Object)
+    .Object@significant_events=significant_events
     return(.Object)
   })
 
@@ -27,7 +28,8 @@ setMethod("show",
     cat("     condition 2:", head(object@conditions$cond2, n=4), "(...)\n")
     cat("   Gene expression:", head(object@gexp, n=4), "(...)\n")
     cat("   Dominance:", head(object@dominance, n=4), "(...)\n")
-    cat("   Transcript biotypes:", names(table(tes@biotypes$tBiotype)), "\n")
+    cat("   Unique transcript biotypes:", names(table(tes@biotypes$tBiotype)), "\n")
+    cat("   Significant events:", object@significant_events, "\n")
   })
 
 setMethod("id", "TranscriptExpressionSet", function(object) object@id)
@@ -54,13 +56,16 @@ setMethod("dominance", "TranscriptExpressionSet",
 setMethod("biotypes", "TranscriptExpressionSet", 
   function(object) object@biotypes)
 
+setMethod("significant_events", "TranscriptExpressionSet",
+  function(object) object@significant_events)
+
 ## plots
 setMethod("plotStars",
   signature(tes="TranscriptExpressionSet", 
             outfile="character"),
   function(tes, outfile) {
     # include tBiotype info + reorder transcripts
-    data=.annotate_data(data=tes@.scaledexp, biotypes=tes@biotypes)
+    data=.annotate_data(data=tes@.scaledexp, significant_events=tes@significant_events, biotypes=tes@biotypes)
 
     # colors
     col=unlist(tes@.cols)[seq(1, length(unlist(tes@.cols)), by=2)]
@@ -132,11 +137,17 @@ setMethod("plotDistr",
 ## internal methods
 setMethod(".annotate_data", 
   signature(data="matrix",
+	    significant_events="character",
             biotypes="data.frame"),
-  function(data=data, biotypes=biotypes) {
+  function(data=data, significant_events=significant_events, biotypes=biotypes) {
     data=data[order(rownames(data)),]
-    
+  
     biotypes=biotypes[order(biotypes$tId),]
+
+    biotypes$tId=as.character(biotypes$tId)
+    se=biotypes$tId %in% significant_events
+    biotypes[se,]$tId=paste(biotypes[se,]$tId, "**", sep=" ")
+
     rn=paste(biotypes$tBiotype, " - ", biotypes$tId, sep="")
     rownames(data)=rn
 
@@ -210,13 +221,17 @@ setMethod(".plot_boxplots",
       
       # transcript relative abundances
       # annotate + reorder data first
-      data=.annotate_data(data=tes@.relexp, biotypes=tes@biotypes)
+      data=.annotate_data(data=tes@.relexp, significant_events=tes@significant_events, biotypes=tes@biotypes)
 
       for(i in 1:nOfT){
         plot_count=plot_count+1
+
+        xlab=gsub(" - ", "\n", rownames(data)[i])
+        xlab=gsub(" **", "\n**", xlab, fixed=T)
+
         .subplot_boxplots(
           ldata=list(data[i, tes@conditions$cond1], data[i, tes@conditions$cond2]),
-          xlab=gsub(" - ", "\n", rownames(data)[i]),
+          xlab=xlab,
           ylab="transcript relative abundance", 
           type="trel", 
           mar=mar, 
@@ -331,14 +346,17 @@ setMethod(".plot_segments",
       
       # transcript relative abundances
       # annotate + reorder data first
-      data=.annotate_data(data=tes@.relexp, biotypes=tes@biotypes)
+      data=.annotate_data(data=tes@.relexp, significant_events=tes@significant_events, biotypes=tes@biotypes)
       
       for (i in 1:nOfT) {
         plot_count=plot_count+1
+        
+        xlab=gsub(" - ", "\n", rownames(data)[i])
+        xlab=gsub(" **", "\n**", xlab, fixed=T)
         .subplot_segments(
           data1=data[i, tes@conditions$cond1], 
           data2=data[i, tes@conditions$cond2], 
-          xlab=gsub(" - ", "\n", rownames(data)[i]),
+          xlab=xlab,
           ylab="transcript relative abundance",
           type="trel",
           mar=mar, 

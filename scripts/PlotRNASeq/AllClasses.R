@@ -8,6 +8,7 @@ setClass("TranscriptExpressionSet",
     .relexp="matrix",
     .scaledexp="matrix",
     biotypes="data.frame",
-    .cols="list"
+    .cols="list",
+    significant_events="character"
   )
 )
