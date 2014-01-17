@@ -26,11 +26,17 @@ readBiotypeData=function(gId=gId, infile=infile) {
   return(tBiotype)
 }
 
-readSignificantEvents=function(gId=gId, infile=significant_events) {
+readSignificantEvents=function(gId=gId, infile=filt) {
   # significant events, if any
   command=paste("grep", gId, infile, sep=" ")
-  significant_events=as.character(read.table(pipe(command))[,2])
-
+  significant_events=tryCatch(
+        {
+	    significant_events=as.character(read.table(pipe(command))[,2])	
+        },
+        error=function(e) {
+            significant_events="NA"
+        }
+  )    
   return(significant_events)
 }
 

@@ -19,6 +19,7 @@ $arguments{'data_dir'}="./data";
 $arguments{'out_dir'}="./html";
 $arguments{'threshold_gexp'}=0.01;
 $arguments{'tool'}="";
+$arguments{'filt'}="NA";
 
 GetOptions(
 	\%arguments, 
@@ -31,7 +32,8 @@ GetOptions(
         'out_dir|o=s',
         'cond1|c1=s',
         'cond2|c2=s',
-        'threshold_gexp|g=f'
+        'threshold_gexp|g=f',
+	'filt|f=s'
 ) or die pod2usage(
 	-input => "$Bin/doc/lorem.pod",
 	-verbose => 1
@@ -115,6 +117,11 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 				die $message;
 	}
 	
+	if ($arguments{'filt'} ne "NA" and 
+			! -e $arguments{'filt'}) {
+				die("Cannot open $arguments{'input'}: $!\n");
+	}
+
 	## finally, find switch events
 	get_switch(\%arguments);
 

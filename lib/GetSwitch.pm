@@ -622,15 +622,16 @@ sub _print_html {
 
 		## generate plots
 		my $expdata=$arguments{'input'};
+		my $filt=$arguments{'filt'};
 		my $annot=$arguments{'data_dir'}."/".
 			"$arguments{'species'}.$arguments{'ensembl_v'}/".
 			"ensembl1.txt";
 		my $cond1=$arguments{'cond1'};
 		my $cond2=$arguments{'cond2'};
 		my $command="R CMD BATCH --no-save ".
-		  "\"--args bin='$Bin' gId='$gId' expdata='$expdata' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
+		  "\"--args bin='$Bin' gId='$gId' expdata='$expdata' filt='$filt' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
 		  "$Bin/scripts/generate_plots.R /dev/null";
-		print $command."\n";
+		# print $command."\n";
 		system($command);
 	}
 

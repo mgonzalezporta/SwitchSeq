@@ -66,3 +66,6 @@ setGeneric(".subplot_segments",
 
 setGeneric(".annotate_data", 
 	function(data=data, significant_events=significant_events, biotypes=biotypes) standardGeneric(".annotate_data"))
+
+setGeneric(".expand_xlab",
+        function(object) standardGeneric(".expand_xlab"))
