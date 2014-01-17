@@ -65,7 +65,8 @@ getOutfile=function(outdir=outdir, plot_type=plot_type, gId=gId) {
   dir.create(outdir_plots_type, showWarnings = FALSE)
 
   # create gId subdirectory
-  id=paste(unlist(strsplit(gId, ''))[c(1:12)], collapse='')
+  s=unlist(strsplit(gId, ''))
+  id=paste(s[c(1:(length(s)-3))], collapse='')
   outdir_plots_type_id=paste(outdir_plots_type, id, sep="/")
   dir.create(outdir_plots_type_id, showWarnings = FALSE)
   
