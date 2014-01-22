@@ -16,21 +16,13 @@ sub get_data {
 	my $species=$ref_arguments->{'species'};
 	my $ensembl_v=$ref_arguments->{'ensembl_v'};
 
-	## expand species name
-	my %species_full=(
-		hsa	    => "homo_sapiens",
-		mmu	    => "mus_musculus",
-		rno	    => "rattus_norvegicus",
-		dre	    => "danio_rerio"
-	);
-
 	## define urls
 	## by default, work with the latest version of APPRIS
 	my %url=(
 		ensembl_1   => "http://www.ebi.ac.uk/~mar/tools/lorem/data_for_download/$species.$ensembl_v/ensembl1.txt",
 		ensembl_2   => "http://www.ebi.ac.uk/~mar/tools/lorem/data_for_download/$species.$ensembl_v/ensembl2.txt",
 		prot_seq    => "http://www.ebi.ac.uk/~mar/tools/lorem/data_for_download/$species.$ensembl_v/prot_seq.tar.gz",
-		appris      => "http://appris.bioinfo.cnio.es/download/data/$species_full{$species}/appris_data.principal.txt",
+		appris      => "http://www.ebi.ac.uk/~mar/tools/lorem/data_for_download/$species.$ensembl_v/appris_data.principal.txt"
 	);
 
 	## create directory structure

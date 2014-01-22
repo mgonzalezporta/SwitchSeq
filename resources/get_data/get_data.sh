@@ -26,6 +26,29 @@ out=$outdir/ensembl2.txt
 echo "gene_id uniprot_id" > $out
 perl query_biomart.pl $in_xml $species $path | grep -E '^[[:alnum:]]+\s[[:alnum:]]+' >> $out
 
+## appris
+echo "Retrieving appris_data.principal.txt..."
+case $species in
+	hsa)
+		species_full=homo_sapiens
+		;;
+        mmu)
+                species_full=mus_musculus
+		;;
+        rno)
+                species_full=rattus_norvegicus
+		;;
+        dre)
+                species_full=danio_rerio
+		;;
+esac
+
+echo "s: $species sf: $species_full"
+
+appris=http://appris.bioinfo.cnio.es/download/data/$species_full/appris_data.principal.txt
+wget $appris 
+mv appris_data.principal.txt $outdir
+
 ## protein sequences
 echo "Retrieving protein sequences..."
 
