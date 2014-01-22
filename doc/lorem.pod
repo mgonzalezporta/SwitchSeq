@@ -2,9 +2,7 @@
 
 =head1 NAME
 
-lorem - A tool to identify switch events
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tempus nisl nunc, nec pulvinar magna condimentum non. Cras convallis dictum nisl, et facilisis lectus euismod id.
+Lorem - A tool for the identification, annotation and visualisation of extreme changes in splicing in RNA-seq experiments
 
 =head1 VERSION
 

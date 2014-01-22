@@ -14,9 +14,9 @@ Print the documentation.
 
 =item B<** REQUIRED **>
 
-=item B<--species> | B<-s> <hsa|mmu>
+=item B<--species> | B<-s> <string>
 
-Species: human or mouse.
+Species (three letter code). 
 
 =item B<--ensembl_v> | B<-e> <integer>
 
@@ -27,8 +27,6 @@ Ensembl version.
 =item B<--data_dir> | B<-d> <dir>
 
 Temporary data directory. [default: ./data]
-
-
 
 =back
 

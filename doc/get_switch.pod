@@ -2,7 +2,7 @@
 
 =head1 SYNOPSIS
 
-lorem -t get_data [options]
+lorem -t get_switch [options]
 
 =head1 OPTIONS
 
@@ -20,7 +20,7 @@ Input file. Columns have to be specified as follows:
 gene_id (1)
 transcript_id (2)
 transcript FPKMs in each sample (3-).
-For example, for an experiment with 3 controls and 3 KO, column names could be specified as follows:
+Eg, for an experiment with 3 controls and 3 KO, column names could be the following:
 
 gene_id transcript_id C1 C2 C3 KO1 KO2 KO3
 
@@ -32,9 +32,9 @@ Columns for condition 1. [example: --cond1 3-5]
 
 Columns for condition 2. [example: --cond2 6-8]
 
-=item B<--species> | B<-s> <hsa|mmu>
+=item B<--species> | B<-s> <string>
 
-Species: human or mouse.
+Species (three letter code).
 
 =item B<--ensembl_v> | B<-e> <integer>
 
@@ -48,15 +48,15 @@ html output dir. [default: ./html]
 
 =item B<--data_dir> | B<-d> <dir>
 
-Temporary data directory. [default: ./data]
+Data directory containing information from Ensembl and APPRIS. [default: ./data]
 
 =item B<--threshold_gexp> | B<-g> <float>
 
 Gene expression threshold. [default: 0.01]
 
-=item B<--plot> | B<-p> <starplots|barplots|both>
+=item B<--filt> | B<-f> <file>
 
-Plots to create. [default: starplots]
+List of transcript ids that undergo differential usage across the studied conditions. [default: NA]
 
 =back
 
