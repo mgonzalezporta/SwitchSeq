@@ -187,8 +187,14 @@ sub _obtain_switch_events {
 	my $ref_ensembl=_load_ensembl($ensembl_input1, $ensembl_input2);
 	#print Dumper %$ref_ensembl;
 
-	my $appris_input="$data_dir/$species.$ensembl_v/appris_data.principal.txt";
-	my $ref_appris=_load_appris($appris_input);
+	my $ref_appris="NA";
+	if (#$species eq "hsa"
+                 $species eq "mmu"
+                or $species eq "dre"
+                or $species  eq "rno") {
+		my $appris_input="$data_dir/$species.$ensembl_v/appris_data.principal.txt";
+		$ref_appris=_load_appris($appris_input);
+	}
 
 	## find and annotate
 	my $ref_switch=_find_switch($ref_major_tx, $ref_recurrent_major_tx, $ref_arguments);
@@ -401,13 +407,10 @@ sub _get_prot_identity {
 
 	my $tId_cond1=$ref_subset_switch->{'C1.tId'};
 	my $tId_cond2=$ref_subset_switch->{'C2.tId'};
-        my ($species_id_cond1, $numeric_id_cond1) = $tId_cond1 =~ /([a-zA-Z]+)(\d+)/;
-	my $fa_cond1="$data_dir/$species.$ensembl_v/prot_seq/".$species_id_cond1.substr($numeric_id_cond1, 0, 8)."/$tId_cond1.fa";
-	my ($species_id_cond2, $numeric_id_cond2) = $tId_cond2 =~ /([a-zA-Z]+)(\d+)/;
-        my $fa_cond2="$data_dir/$species.$ensembl_v/prot_seq/".$species_id_cond2.substr($numeric_id_cond2, 0, 8)."/$tId_cond2.fa";
+	my $fa_cond1="$data_dir/$species.$ensembl_v/prot_seq/".substr($tId_cond1, 0, -3)."/$tId_cond1.fa";
+        my $fa_cond2="$data_dir/$species.$ensembl_v/prot_seq/".substr($tId_cond2, 0, -3)."/$tId_cond2.fa";
 
-	my ($species_id, $numeric_id) = $gId =~ /([a-zA-Z]+)(\d+)/;
-   	my $outdir_aln="$out_dir/data/prot_aln/".$species_id.substr($numeric_id, 0, 8);
+   	my $outdir_aln="$out_dir/data/prot_aln/".substr($gId, 0, -3);
    	unless ( -e  $outdir_aln ) { system("mkdir $outdir_aln") };
    	my $out_aln="$outdir_aln/$gId.needle_mod.out";
    	my $pIdentity="NA";
@@ -462,7 +465,11 @@ sub _is_principal {
 
 	my $isPrincipal="NO";
 
-	if (defined $ref_appris->{$tId}) { $isPrincipal="YES" };
+	if ($ref_appris eq "NA") { 
+		$isPrincipal="NA";
+	} elsif (defined $ref_appris->{$tId}) { 
+		$isPrincipal="YES";
+	}
 
 	return($isPrincipal);
 }
@@ -536,7 +543,17 @@ sub _print_json {
 			$k =~ s/\./_/;
 			$tmp_hash{$k}=$value;
 		}
-		
+
+		## add urls
+		$tmp_hash{'href_ensembl'}="http://www.ensembl.org/Multi/Search/Results?q=".$tmp_hash{'gId'};
+		$tmp_hash{'href_appris_C1'}="http://appris.bioinfo.cnio.es/search.html?query=".$tmp_hash{'C1_tId'};
+		$tmp_hash{'href_appris_C2'}="http://appris.bioinfo.cnio.es/search.html?query=".$tmp_hash{'C2_tId'};
+		$tmp_hash{'href_pdb'}="http://www.ebi.ac.uk/pdbe/widgets/unipdb?uniprot=".$tmp_hash{'pdbEntry'};
+		$tmp_hash{'href_distrplot'}="./data/plots/distrplots/".substr($tmp_hash{'gId'}, 0, -3)."/".$tmp_hash{'gId'}.".pdf";
+		$tmp_hash{'href_starplot'}="./data/plots/starplots/".substr($tmp_hash{'gId'}, 0, -3)."/".$tmp_hash{'gId'}.".pdf";
+		$tmp_hash{'href_needle'}="./data/prot_aln/".substr($tmp_hash{'gId'}, 0, -3)."/".$tmp_hash{'gId'}.".needle_mod.out";
+
+		## push
 		push(@array_input, \%tmp_hash)
 	}
 
