@@ -28,6 +28,7 @@
 				    <div class="accordion-inner">
 				    	<p><b>Input:</b> {$info{'input'}}</p>
 				    	<p><b>Data directory:</b> {$info{'data_dir'}}</p>
+					<p><b>Differentially used transcripts:</b> {$info{'filt'}}</p>
 				    	<p><b>Species:</b> {$info{'species'}}</p>
 				    	<p><b>Ensembl version:</b> {$info{'ensembl_v'}}</p>
 				    	<p><b>Condition 1:</b> 
@@ -46,7 +47,7 @@
 				    		$ncols
 				    		} samples
 				    	</p>
-				 
+					<p><b>Gene expression threshold (RPKMs/FPKMs):</b> {$info{'threshold_gexp'}}</p>
 				    </div>
 			    </div>
 		  	</div>
