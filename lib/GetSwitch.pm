@@ -188,8 +188,8 @@ sub _obtain_switch_events {
 	#print Dumper %$ref_ensembl;
 
 	my $ref_appris="NA";
-	if (#$species eq "hsa"
-                 $species eq "mmu"
+	if ($species eq "hsa"
+                or $species eq "mmu"
                 or $species eq "dre"
                 or $species  eq "rno") {
 		my $appris_input="$data_dir/$species.$ensembl_v/appris_data.principal.txt";
