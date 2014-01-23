@@ -16,15 +16,14 @@ our @EXPORT = qw( get_switch );
 sub get_switch {
 	## collect arguments
 	my $ref_arguments=$_[0];
-	my %arguments=%{$ref_arguments};
-	my $input=$arguments{'input'};
-	my $out_dir=$arguments{'out_dir'};
-	my $data_dir=$arguments{'data_dir'};
-	my $species=$arguments{'species'};
-	my $ensembl_v=$arguments{'ensembl_v'};
-	my $cond1=$arguments{'cond1'};
-	my $cond2=$arguments{'cond2'};
-	my $threshold_gexp=$arguments{'threshold_gexp'};
+	my $input=$ref_arguments->{'input'};
+	my $out_dir=$ref_arguments->{'out_dir'};
+	my $data_dir=$ref_arguments->{'data_dir'};
+	my $species=$ref_arguments->{'species'};
+	my $ensembl_v=$ref_arguments->{'ensembl_v'};
+	my $cond1=$ref_arguments->{'cond1'};
+	my $cond2=$ref_arguments->{'cond2'};
+	my $threshold_gexp=$ref_arguments->{'threshold_gexp'};
 
 	## prepare dir structure
 	_prepare_dir_structure($ref_arguments);
@@ -33,7 +32,7 @@ sub get_switch {
 	print "# Obtaining and annotating alternative splicing switch events...\n";
 
 	## calculations
-	my $ref_major_tx=_obtain_major_tx($arguments{'input'});
+	my $ref_major_tx=_obtain_major_tx($input);
 	#print Dumper %$ref_major_tx;
 	my $ref_recurrent_major_tx=_obtain_recurrent_major_tx($ref_major_tx, $ref_arguments);
 	#print Dumper %$ref_recurrent_major_tx;
@@ -53,8 +52,7 @@ sub get_switch {
 
 sub _prepare_dir_structure {
 	my $ref_arguments=$_[0];
-	my %arguments=%$ref_arguments;
-	my $out_dir=$arguments{'out_dir'};
+	my $out_dir=$ref_arguments->{'out_dir'};
 
 	unless ( -e $out_dir ) { system("mkdir $out_dir") };
 	unless ( -e "$out_dir/data" ) { system("mkdir $out_dir/data") };
@@ -119,21 +117,19 @@ sub _obtain_recurrent_major_tx {
 	my $ref_major_tx=$_[0];
 	my $ref_arguments=$_[1];
 
-	my %major_tx=%$ref_major_tx;
-	my %arguments=%{$ref_arguments};
-	my $cond1=$arguments{'cond1'};
+	my $cond1=$ref_arguments->{'cond1'};
 	my $ref_cond1=_adjust_columns($cond1);
-	my $cond2=$arguments{'cond2'};
+	my $cond2=$ref_arguments->{'cond2'};
 	my $ref_cond2=_adjust_columns($cond2);
-	my $threshold_gexp=$arguments{'threshold_gexp'};
+	my $threshold_gexp=$ref_arguments->{'threshold_gexp'};
 	my %recurrent_tx;
 		# gId => | cond1 => | recurrent_tx_id
 		#                   | recurrent_tx_count
 		# 		 | cond2 => | recurrent_tx_id
 		# 		            | recurrent_tx_count
 
-	foreach my $gId (keys %major_tx) {
-		my %subset_major_tx=%{ $major_tx{$gId} };
+	foreach my $gId (keys %$ref_major_tx) {
+		my %subset_major_tx=%{ $ref_major_tx->{$gId} };
 
 		$recurrent_tx{$gId}{'cond1'}=_get_most_recurrent_tx(\%subset_major_tx, $ref_cond1, $threshold_gexp);
 		$recurrent_tx{$gId}{'cond2'}=_get_most_recurrent_tx(\%subset_major_tx, $ref_cond2, $threshold_gexp);
@@ -152,17 +148,15 @@ sub _obtain_recurrent_major_tx {
 
 sub _get_most_recurrent_tx {
 	my $ref_subset_major_tx=$_[0];
-	my %subset_major_tx=%$ref_subset_major_tx;
 	my $ref_columns=$_[1];	
-	my @columns=@$ref_columns;
 	my $threshold_gexp=$_[2];
 	my %count;
 	my %result;
 
 	## count how many times each transcript is detected as major
-	foreach my $i (@columns) {
-		if (@{ $subset_major_tx{'gExp'} }[$i] >= $threshold_gexp) {
-			my $tId=@{ $subset_major_tx{'major_tx_id'} }[$i];
+	foreach my $i (@$ref_columns) {
+		if (@{ $ref_subset_major_tx->{'gExp'} }[$i] >= $threshold_gexp) {
+			my $tId=@{ $ref_subset_major_tx->{'major_tx_id'} }[$i];
 			$count{$tId}++;
 		}
 	}
@@ -181,11 +175,10 @@ sub _obtain_switch_events {
 	my $ref_recurrent_major_tx=$_[1];
 	my $ref_arguments=$_[2];
 
-	my %arguments=%$ref_arguments;
-	my $data_dir=$arguments{'data_dir'};
-	my $species=$arguments{'species'};
-	my $ensembl_v=$arguments{'ensembl_v'};
-	my $out_dir=$arguments{'out_dir'};
+	my $data_dir=$ref_arguments->{'data_dir'};
+	my $species=$ref_arguments->{'species'};
+	my $ensembl_v=$ref_arguments->{'ensembl_v'};
+	my $out_dir=$ref_arguments->{'out_dir'};
 	my $output="$out_dir/switch.txt";
 	
 	## load data
@@ -214,7 +207,7 @@ sub _load_ensembl {
 	while( my $row = <INPUT>)  {
 		chomp ($row);
 
-		if ($row =~ /^ENSG/) {
+		if ($row =~ /^ENS/) {
 			my @row=split(/\s+/, $row);
 			my $gId=$row[0];
 			my $gName=$row[1];
@@ -233,7 +226,7 @@ sub _load_ensembl {
 	while( my $row = <INPUT>)  {
 		chomp ($row);
 
-		if ($row =~ /^ENSG/) {
+		if ($row =~ /^ENS/) {
 			my @row=split(/\s+/, $row);
 			my $gId=$row[0];
 			my $uniprotId=$row[1];
@@ -302,41 +295,38 @@ sub _get_header {
 
 sub _find_switch {
 	my $ref_major_tx=$_[0];
-	my $ref_recurrent_major_tx=$_[1];
+	my $ref_recurrent_tx=$_[1];
 	my $ref_arguments=$_[2];
 	
-	my %major_tx=%$ref_major_tx;
-	my %recurrent_tx=%$ref_recurrent_major_tx;
 	my %switch;
-	my %arguments=%$ref_arguments;
-	my $cond1=$arguments{'cond1'};
+	my $cond1=$ref_arguments->{'cond1'};
 	my $ref_cond1=_adjust_columns($cond1);
-	my $cond2=$arguments{'cond2'};
+	my $cond2=$ref_arguments->{'cond2'};
 	my $ref_cond2=_adjust_columns($cond2);
-	my $threshold_gexp=$arguments{'threshold_gexp'};
+	my $threshold_gexp=$ref_arguments->{'threshold_gexp'};
 
-	foreach my $gId (keys %recurrent_tx) {
-		my $tId_cond1=$recurrent_tx{$gId}{'cond1'}{'recurrent_tx_id'};
-		my $tId_cond2=$recurrent_tx{$gId}{'cond2'}{'recurrent_tx_id'};
+	foreach my $gId (keys %$ref_recurrent_tx) {
+		my $tId_cond1=$ref_recurrent_tx->{$gId}{'cond1'}{'recurrent_tx_id'};
+		my $tId_cond2=$ref_recurrent_tx->{$gId}{'cond2'}{'recurrent_tx_id'};
 
 		if ( $tId_cond1 ne $tId_cond2) {
 			## calculate major transcript expression breadth
-			my $tExp_count_cond1=$recurrent_tx{$gId}{'cond1'}{'recurrent_tx_count'};
-			my $gExp_count_cond1=_get_gexp_count([ @{ $major_tx{$gId}{'gExp'} }[@$ref_cond1] ], $threshold_gexp);
+			my $tExp_count_cond1=$ref_recurrent_tx->{$gId}{'cond1'}{'recurrent_tx_count'};
+			my $gExp_count_cond1=_get_gexp_count([ @{ $ref_major_tx->{$gId}{'gExp'} }[@$ref_cond1] ], $threshold_gexp);
 			my $breadth_cond1=_get_exp_breadth($tExp_count_cond1, $gExp_count_cond1);
 
-			my $tExp_count_cond2=$recurrent_tx{$gId}{'cond2'}{'recurrent_tx_count'};
-			my $gExp_count_cond2=_get_gexp_count([ @{ $major_tx{$gId}{'gExp'} }[@$ref_cond2] ], $threshold_gexp);
+			my $tExp_count_cond2=$ref_recurrent_tx->{$gId}{'cond2'}{'recurrent_tx_count'};
+			my $gExp_count_cond2=_get_gexp_count([ @{ $ref_major_tx->{$gId}{'gExp'} }[@$ref_cond2] ], $threshold_gexp);
 			my $breadth_cond2=_get_exp_breadth($tExp_count_cond2, $gExp_count_cond2);
 
 			## report switch events
 			if ($breadth_cond1 > 50 and $breadth_cond2 > 50) {
-				$switch{$gId}{'C1.tId'}=$recurrent_tx{$gId}{'cond1'}{'recurrent_tx_id'};
+				$switch{$gId}{'C1.tId'}=$ref_recurrent_tx->{$gId}{'cond1'}{'recurrent_tx_id'};
 				$switch{$gId}{'C1.tExp'}=$tExp_count_cond1;
 				$switch{$gId}{'C1.gExp'}=$gExp_count_cond1;
 				$switch{$gId}{'C1.breadth'}=$breadth_cond1;
 
-				$switch{$gId}{'C2.tId'}=$recurrent_tx{$gId}{'cond2'}{'recurrent_tx_id'};
+				$switch{$gId}{'C2.tId'}=$ref_recurrent_tx->{$gId}{'cond2'}{'recurrent_tx_id'};
 				$switch{$gId}{'C2.tExp'}=$tExp_count_cond2;
 				$switch{$gId}{'C2.gExp'}=$gExp_count_cond2;
 				$switch{$gId}{'C2.breadth'}=$breadth_cond2;
@@ -351,10 +341,8 @@ sub _get_gexp_count {
 	my $ref_subset_gExp=$_[0];
 	my $threshold_gexp=$_[1];
 
-	my @subset_gExp=@$ref_subset_gExp;
-
 	my $gExp_count=0;
-	foreach my $g (@subset_gExp) {
+	foreach my $g (@$ref_subset_gExp) {
 		if ($g >= $threshold_gexp) {
 			$gExp_count++;
 		}
@@ -376,34 +364,29 @@ sub _annotate_switch {
 	my $ref_appris=$_[2];
 	my $ref_arguments=$_[3];
 
-	my %switch=%$ref_switch;
-	my %ensembl=%$ref_ensembl;
-	# args: data_dir species, ensembl_v, outdir
-
-	foreach my $gId (keys %switch) {
-		$switch{$gId}{'gName'}=$ensembl{$gId}{'gName'};
-		$switch{$gId}{'nOfT'}=$ensembl{$gId}{'nOfT'};
-        $switch{$gId}{'C1.principal'}=_is_principal( $switch{$gId}{'C1.tId'}, $ref_appris );
-        $switch{$gId}{'C2.principal'}=_is_principal( $switch{$gId}{'C2.tId'}, $ref_appris );
-        $switch{$gId}{'C1.biotype'}=_get_tx_biotype( $gId, $switch{$gId}{'C1.tId'}, $ref_ensembl );
-        $switch{$gId}{'C2.biotype'}=_get_tx_biotype( $gId, $switch{$gId}{'C2.tId'}, $ref_ensembl );
- 		$switch{$gId}{'rank'}=_calculate_rank( $switch{$gId} );	 		
-        $switch{$gId}{'pIdentity'}="NA";
-    	$switch{$gId}{'pdbEntry'}="NO";
-
-        if ($switch{$gId}{'C1.biotype'} eq "protein_coding" and 
-        	$switch{$gId}{'C2.biotype'} eq "protein_coding") {
-	            ## pIdentity
-	            $switch{$gId}{'pIdentity'}=_get_prot_identity($ref_arguments, $gId, $switch{$gId});
-
-	            ## pdbEntry
-	            if (defined $ensembl{$gId}{'uniprotId'}) {
-		            $switch{$gId}{'pdbEntry'}=$ensembl{$gId}{'uniprotId'};
-	            } 
-        }
-	       
+	foreach my $gId (keys %$ref_switch) {
+		$ref_switch->{$gId}{'gName'}=$ref_ensembl->{$gId}{'gName'};
+		$ref_switch->{$gId}{'nOfT'}=$ref_ensembl->{$gId}{'nOfT'};
+	        $ref_switch->{$gId}{'C1.principal'}=_is_principal( $ref_switch->{$gId}{'C1.tId'}, $ref_appris );
+	        $ref_switch->{$gId}{'C2.principal'}=_is_principal( $ref_switch->{$gId}{'C2.tId'}, $ref_appris );
+	        $ref_switch->{$gId}{'C1.biotype'}=_get_tx_biotype( $gId, $ref_switch->{$gId}{'C1.tId'}, $ref_ensembl );
+	        $ref_switch->{$gId}{'C2.biotype'}=_get_tx_biotype( $gId, $ref_switch->{$gId}{'C2.tId'}, $ref_ensembl );
+		$ref_switch->{$gId}{'rank'}=_calculate_rank( $ref_switch->{$gId} );	 		
+	        $ref_switch->{$gId}{'pIdentity'}="NA";
+	    	$ref_switch->{$gId}{'pdbEntry'}="NO";
+	
+	        if ($ref_switch->{$gId}{'C1.biotype'} eq "protein_coding" and 
+	        	$ref_switch->{$gId}{'C2.biotype'} eq "protein_coding") {
+		            ## pIdentity
+		            $ref_switch->{$gId}{'pIdentity'}=_get_prot_identity($ref_arguments, $gId, $ref_switch->{$gId});
+	
+		            ## pdbEntry
+		            if (defined $ref_ensembl->{$gId}{'uniprotId'}) {
+			            $ref_switch->{$gId}{'pdbEntry'}=$ref_ensembl->{$gId}{'uniprotId'};
+		            } 
+	        }
 	}	
-	return \%switch;
+	return $ref_switch;
 }
 
 sub _get_prot_identity {
@@ -411,15 +394,13 @@ sub _get_prot_identity {
 	my $gId=$_[1];
 	my $ref_subset_switch=$_[2];
 
-	my %arguments=%{$ref_arguments};
-	my $out_dir=$arguments{'out_dir'};
-	my $data_dir=$arguments{'data_dir'};
-	my $species=$arguments{'species'};
-	my $ensembl_v=$arguments{'ensembl_v'};
+	my $out_dir=$ref_arguments->{'out_dir'};
+	my $data_dir=$ref_arguments->{'data_dir'};
+	my $species=$ref_arguments->{'species'};
+	my $ensembl_v=$ref_arguments->{'ensembl_v'};
 
-	my %subset_switch=%$ref_subset_switch;
-	my $tId_cond1=$subset_switch{'C1.tId'};
-	my $tId_cond2=$subset_switch{'C2.tId'};
+	my $tId_cond1=$ref_subset_switch->{'C1.tId'};
+	my $tId_cond2=$ref_subset_switch->{'C2.tId'};
         my ($species_id_cond1, $numeric_id_cond1) = $tId_cond1 =~ /([a-zA-Z]+)(\d+)/;
 	my $fa_cond1="$data_dir/$species.$ensembl_v/prot_seq/".$species_id_cond1.substr($numeric_id_cond1, 0, 8)."/$tId_cond1.fa";
 	my ($species_id_cond2, $numeric_id_cond2) = $tId_cond2 =~ /([a-zA-Z]+)(\d+)/;
@@ -479,12 +460,11 @@ sub _is_principal {
 	my $tId=$_[0];
 	my $ref_appris=$_[1];
 
-	my %appris=%$ref_appris;
-    my $isPrincipal="NO";
+	my $isPrincipal="NO";
 
-    if (defined $appris{$tId}) { $isPrincipal="YES" };
+	if (defined $ref_appris->{$tId}) { $isPrincipal="YES" };
 
-    return($isPrincipal);
+	return($isPrincipal);
 }
 
 sub _get_tx_biotype {
@@ -492,18 +472,15 @@ sub _get_tx_biotype {
  	my $tId=$_[1];
  	my $ref_ensembl=$_[2];
 
- 	my %ensembl=%$ref_ensembl;
-
-    my $tBiotype=$ensembl{$gId}{'transcripts'}{$tId};
+        my $tBiotype=$ref_ensembl->{$gId}{'transcripts'}{$tId};
     
-    return $tBiotype;
+        return $tBiotype;
 }
 
 sub _calculate_rank {
 	my $ref_subset_switch=$_[0];
 
-	my %subset_switch=%$ref_subset_switch;
-	my @exp=($subset_switch{'C1.tExp'}, $subset_switch{'C1.gExp'}, $subset_switch{'C2.tExp'}, $subset_switch{'C2.gExp'});
+	my @exp=($ref_subset_switch->{'C1.tExp'}, $ref_subset_switch->{'C1.gExp'}, $ref_subset_switch->{'C2.tExp'}, $ref_subset_switch->{'C2.gExp'});
 	#my $exp=[ $tExp_count_cond1, $gExp_count_cond1, $tExp_count_cond2, $gExp_count_cond2 ];
 
 	my $a=($exp[0]+$exp[1])*(1-abs($exp[0]-$exp[1])/max($exp[0],$exp[1]));
@@ -518,9 +495,7 @@ sub _print_txt {
 	my $ref_switch=$_[0];
 	my $ref_arguments=$_[1];
 
-	my %switch=%$ref_switch;
-	my %arguments=%$ref_arguments;
-	my $out_dir=$arguments{'out_dir'};
+	my $out_dir=$ref_arguments->{'out_dir'};
 	my $out_file="$out_dir/data/switch.txt";
 
 	## prepare output
@@ -528,16 +503,16 @@ sub _print_txt {
 	my $ref_header=_get_header(1);
 	print $fh "@$ref_header \n";
 
-	foreach my $gId (keys %switch) {
-		print $fh "$gId $switch{$gId}{'gName'} $switch{$gId}{'nOfT'} ";
-		print $fh "$switch{$gId}{'C1.tId'} $switch{$gId}{'C1.principal'} ";
-		print $fh "$switch{$gId}{'C1.biotype'} $switch{$gId}{'C1.tExp'} ";
-		print $fh "$switch{$gId}{'C1.gExp'} $switch{$gId}{'C1.breadth'} ";
-		print $fh "$switch{$gId}{'C2.tId'} $switch{$gId}{'C2.principal'} ";
-		print $fh "$switch{$gId}{'C2.biotype'} $switch{$gId}{'C2.tExp'} ";
-		print $fh "$switch{$gId}{'C2.gExp'} $switch{$gId}{'C2.breadth'} ";
-		print $fh "$switch{$gId}{'pIdentity'} $switch{$gId}{'pdbEntry'} ";
-		print $fh "$switch{$gId}{'rank'}\n";
+	foreach my $gId (keys %$ref_switch) {
+		print $fh "$gId $ref_switch->{$gId}{'gName'} $ref_switch->{$gId}{'nOfT'} ";
+		print $fh "$ref_switch->{$gId}{'C1.tId'} $ref_switch->{$gId}{'C1.principal'} ";
+		print $fh "$ref_switch->{$gId}{'C1.biotype'} $ref_switch->{$gId}{'C1.tExp'} ";
+		print $fh "$ref_switch->{$gId}{'C1.gExp'} $ref_switch->{$gId}{'C1.breadth'} ";
+		print $fh "$ref_switch->{$gId}{'C2.tId'} $ref_switch->{$gId}{'C2.principal'} ";
+		print $fh "$ref_switch->{$gId}{'C2.biotype'} $ref_switch->{$gId}{'C2.tExp'} ";
+		print $fh "$ref_switch->{$gId}{'C2.gExp'} $ref_switch->{$gId}{'C2.breadth'} ";
+		print $fh "$ref_switch->{$gId}{'pIdentity'} $ref_switch->{$gId}{'pdbEntry'} ";
+		print $fh "$ref_switch->{$gId}{'rank'}\n";
 	}
     close($fh);
 }
@@ -546,20 +521,18 @@ sub _print_json {
 	my $ref_switch=$_[0];
 	my $ref_arguments=$_[1];
 
-	my %arguments=%$ref_arguments;
-	my $out_dir=$arguments{'out_dir'};
+	my $out_dir=$ref_arguments->{'out_dir'};
 	my $out_file="$out_dir/js/data.js";
 
 	## convert initial hash to array of hashes
-	my %switch=%$ref_switch;
 	my @array_input;
-	foreach my $gId (keys %switch) {
+	foreach my $gId (keys %$ref_switch) {
 		my %tmp_hash;
 		
 		$tmp_hash{'gId'}=$gId;
 		## js doesn't allow . in hash keys
-		foreach my $k (keys %{$switch{$gId}}) {
-			my $value=$switch{$gId}{$k};
+		foreach my $k (keys %{$ref_switch->{$gId}}) {
+			my $value=$ref_switch->{$gId}{$k};
 			$k =~ s/\./_/;
 			$tmp_hash{$k}=$value;
 		}
@@ -578,9 +551,7 @@ sub _print_html {
 	my $ref_switch=$_[0];	
 	my $ref_arguments=$_[1];
 
-	my %switch=%{$ref_switch};
-	my %arguments=%{$ref_arguments};
-	my $out_dir=$arguments{'out_dir'};
+	my $out_dir=$ref_arguments->{'out_dir'};
 
 	my $colnames=_get_header(0);
 	my %count=(
@@ -594,40 +565,40 @@ sub _print_html {
 		other => 0
 		);
 
-	foreach my $gId (keys %switch) {
-		if ($switch{$gId}{'C1.biotype'} eq 'protein_coding' 
-			and $switch{$gId}{'C2.biotype'} eq 'protein_coding') {
+	foreach my $gId (keys %$ref_switch) {
+		if ($ref_switch->{$gId}{'C1.biotype'} eq 'protein_coding' 
+			and $ref_switch->{$gId}{'C2.biotype'} eq 'protein_coding') {
 			$count{'pc_to_pc'}++;
-		} elsif ($switch{$gId}{'C1.biotype'} eq 'protein_coding' 
-			and $switch{$gId}{'C2.biotype'} eq 'nonsense_mediated_decay') {
+		} elsif ($ref_switch->{$gId}{'C1.biotype'} eq 'protein_coding' 
+			and $ref_switch->{$gId}{'C2.biotype'} eq 'nonsense_mediated_decay') {
 			$count{'pc_to_nmd'}++;
-		} elsif ($switch{$gId}{'C1.biotype'} eq 'protein_coding' 
-			and $switch{$gId}{'C2.biotype'} eq 'retained_intron') {
+		} elsif ($ref_switch->{$gId}{'C1.biotype'} eq 'protein_coding' 
+			and $ref_switch->{$gId}{'C2.biotype'} eq 'retained_intron') {
 			$count{'pc_to_ri'}++;
-		} elsif ($switch{$gId}{'C1.biotype'} eq 'protein_coding' 
-			and $switch{$gId}{'C2.biotype'} eq 'processed_transcript') {
+		} elsif ($ref_switch->{$gId}{'C1.biotype'} eq 'protein_coding' 
+			and $ref_switch->{$gId}{'C2.biotype'} eq 'processed_transcript') {
 			$count{'pc_to_pt'}++;
-		} elsif ($switch{$gId}{'C1.biotype'} eq 'nonsense_mediated_decay' 
-			and $switch{$gId}{'C2.biotype'} eq 'protein_coding') {
+		} elsif ($ref_switch->{$gId}{'C1.biotype'} eq 'nonsense_mediated_decay' 
+			and $ref_switch->{$gId}{'C2.biotype'} eq 'protein_coding') {
 			$count{'nmd_to_pc'}++;
-		} elsif ($switch{$gId}{'C1.biotype'} eq 'retained_intron' 
-			and $switch{$gId}{'C2.biotype'} eq 'protein_coding') {
+		} elsif ($ref_switch->{$gId}{'C1.biotype'} eq 'retained_intron' 
+			and $ref_switch->{$gId}{'C2.biotype'} eq 'protein_coding') {
 			$count{'ri_to_pc'}++;
-		} elsif ($switch{$gId}{'C1.biotype'} eq 'processed_transcript' 
-			and $switch{$gId}{'C2.biotype'} eq 'protein_coding') {
+		} elsif ($ref_switch->{$gId}{'C1.biotype'} eq 'processed_transcript' 
+			and $ref_switch->{$gId}{'C2.biotype'} eq 'protein_coding') {
 			$count{'pt_to_pc'}++;
 		} else {
 			$count{'other'}++;
 		}
 
 		## generate plots
-		my $expdata=$arguments{'input'};
-		my $filt=$arguments{'filt'};
-		my $annot=$arguments{'data_dir'}."/".
-			"$arguments{'species'}.$arguments{'ensembl_v'}/".
+		my $expdata=$ref_arguments->{'input'};
+		my $filt=$ref_arguments->{'filt'};
+		my $annot=$ref_arguments->{'data_dir'}."/".
+			"$ref_arguments->{'species'}.$ref_arguments->{'ensembl_v'}/".
 			"ensembl1.txt";
-		my $cond1=$arguments{'cond1'};
-		my $cond2=$arguments{'cond2'};
+		my $cond1=$ref_arguments->{'cond1'};
+		my $cond2=$ref_arguments->{'cond2'};
 		my $command="R CMD BATCH --no-save ".
 		  "\"--args bin='$Bin' gId='$gId' expdata='$expdata' filt='$filt' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
 		  "$Bin/scripts/generate_plots.R /dev/null";
@@ -641,7 +612,7 @@ sub _print_html {
 
 	## print index.html
 	my %to_template = (
-		info 	   => \%arguments,
+		info 	   => $ref_arguments,
 		colnames   => $colnames,
 		count 	   => \%count,
 	);
