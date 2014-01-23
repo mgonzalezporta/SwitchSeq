@@ -14,9 +14,13 @@ if [ ! -e $outdir ]; then mkdir $outdir; fi
 echo "Creating ensembl1.txt..."
 in_xml=ensembl1.xml
 out=$outdir/ensembl1.txt
+tmp=$out.tmp
 
-echo "gene_id gene_name number_of_transcripts transcript_id transcript_biotype" > $out
-perl query_biomart.pl $in_xml $species $path >> $out
+echo "gene_id gene_name number_of_transcripts transcript_id transcript_biotype" > $out.tmp
+perl query_biomart.pl $in_xml $species $path >> $out.tmp
+# fix missing values
+cat $out.tmp | sed 's/\t\t/\tNA\t/g' > $out
+rm $out.tmp
 
 ## ensembl2
 echo "Creating ensembl2.txt..."
@@ -27,7 +31,6 @@ echo "gene_id uniprot_id" > $out
 perl query_biomart.pl $in_xml $species $path | grep -E '^[[:alnum:]]+\s[[:alnum:]]+' >> $out
 
 ## appris
-echo "Retrieving appris_data.principal.txt..."
 case $species in
 	hsa)
 		species_full=homo_sapiens
@@ -43,11 +46,12 @@ case $species in
 		;;
 esac
 
-echo "s: $species sf: $species_full"
-
-appris=http://appris.bioinfo.cnio.es/download/data/$species_full/appris_data.principal.txt
-wget $appris 
-mv appris_data.principal.txt $outdir
+if [ ! -z "$species_full" ]
+then
+	echo "Retrieving appris_data.principal.txt..."
+	appris=http://appris.bioinfo.cnio.es/download/data/$species_full/appris_data.principal.txt
+	wget -P $outdir $appris 
+fi
 
 ## protein sequences
 echo "Retrieving protein sequences..."
