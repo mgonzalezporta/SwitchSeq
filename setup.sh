@@ -7,7 +7,7 @@ checkPerlModule() {
     else
         echo "   $1 - NOT FOUND"
 	echo "   Installing $1..."
-        perl -MCPAN -e 'install $1'
+        perl -MCPAN -e "install $1"
     fi
 }
 
