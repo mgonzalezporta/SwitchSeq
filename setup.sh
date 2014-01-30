@@ -33,7 +33,7 @@ RSCRIPT`
 	git clone https://github.com/mgonzalezporta/ipsum.git
 	cd ipsum/
 	R CMD build Ipsum
-	R CMD install Ipsum_1.0.tar.gz
+	R CMD INSTALL Ipsum_1.0.tar.gz
 	rm Ipsum_1.0.tar.gz
     fi
 }
