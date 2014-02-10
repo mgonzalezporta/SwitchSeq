@@ -2,7 +2,7 @@
 
 ## test1: get_switch - 4+4 samples
 echo "Running test 1..."
-lorem -t get_switch \
+switchseq -t get_switch \
 	-s hsa -e 66 \
 	-d ./data_annot \
 	-i ./data_test1/expdata.txt \
@@ -11,7 +11,7 @@ lorem -t get_switch \
 
 ## test2: get_switch - 12+12 samples
 echo "Running test 2..."
-lorem -t get_switch \
+switchseq -t get_switch \
 	-s hsa -e 66 \
 	-d ./data_annot \
 	-i ./data_test2/expdata.txt \

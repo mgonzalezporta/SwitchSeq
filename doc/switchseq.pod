@@ -2,15 +2,15 @@
 
 =head1 NAME
 
-Lorem - A tool for the identification, annotation and visualisation of extreme changes in splicing in RNA-seq experiments
+SwitchSeq - A tool for the identification, annotation and visualisation of extreme changes in splicing in RNA-seq experiments
 
 =head1 VERSION
 
-lorem 1.0
+switchseq 1.0
 
 =head1 SYNOPSIS
 
-lorem [options]
+switchseq [options]
 
 =head1 OPTIONS
 
@@ -27,7 +27,7 @@ Print the documentation.
 Tool to be executed. More information about a specific tool can be obtained
 in its help page:
 
-lorem -t get_data -h
+switchseq -t get_data -h
 
 =back
 

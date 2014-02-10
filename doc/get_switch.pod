@@ -2,7 +2,7 @@
 
 =head1 SYNOPSIS
 
-lorem -t get_switch [options]
+switchseq -t get_switch [options]
 
 =head1 OPTIONS
 

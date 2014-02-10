@@ -34,7 +34,7 @@ GetOptions(
         'threshold_gexp|g=f',
 	'filt|f=s'
 ) or die pod2usage(
-	-input => "$Bin/doc/lorem.pod",
+	-input => "$Bin/doc/switchseq.pod",
 	-verbose => 1
 );
 
@@ -58,7 +58,7 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 		or $arguments{'species'} eq "rno") {
 		my $message="Pre-compiled data available only for human (hsa), mouse (mmu), rat (rno) and zebrafish (dre).\n".
 				"Refer to the project's wiki for further information on how to proceed with other species:\n".
-				"\thttps://github.com/mgonzalezporta/lorem/wiki/Tutorial\n";
+				"\thttps://github.com/mgonzalezporta/SwitchSeq/wiki/Tutorial\n";
 		die $message;
 	}
 
@@ -92,12 +92,12 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 			$cond1[0]<=$cond1[1] and 
 			$cond2[0]<=$cond2[1]) {
 				my $message="Wrong format for column intervals.\n".
-							"Print help: lorem -tool get_switch -h\n";
+							"Print help: switchseq -tool get_switch -h\n";
 				die $message;
 	}
 	unless ($cond1[0]>2) {
 		my $message="Invalid interval for --cond1: the first two columns must contain gene and transcript ids.\n".
-					"Print help: lorem -tool get_switch -h\n";
+					"Print help: switchseq -tool get_switch -h\n";
 		die $message;
 	}
 	unless ($cond1[1]+1==$cond2[0]) {
@@ -111,8 +111,8 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 				my $message="Cannot find data directory:\n".
 							"   $arguments{'data_dir'}/$arguments{'species'}.$arguments{'ensembl_v'}\n".
 							"Data should be downloaded first:\n".
-							"\tlorem -t get_data -h\n".
-							"\thttps://github.com/mgonzalezporta/lorem/wiki/Tutorial\n";
+							"\tswitchseq -t get_data -h\n".
+							"\thttps://github.com/mgonzalezporta/SwitchSeq/wiki/Tutorial\n";
 				die $message;
 	}
 	
@@ -127,14 +127,14 @@ if (defined($arguments{'tool'}) and $arguments{'tool'} eq "get_data") {
 } elsif ($arguments{'help'}) {
 	## print doc - long version
 	die pod2usage(
-		-input => "$Bin/doc/lorem.pod",
+		-input => "$Bin/doc/switchseq.pod",
 		-verbose => 99,
 	    -sections => "NAME|VERSION|SYNOPSIS|OPTIONS" );
 
 } else {
 	## print doc - short version
 	die pod2usage(
-		-input => "$Bin/doc/lorem.pod",
+		-input => "$Bin/doc/switchseq.pod",
 		-verbose => 1
 	);
 }

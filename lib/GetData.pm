@@ -19,10 +19,10 @@ sub get_data {
 	## define urls
 	## by default, work with the latest version of APPRIS
 	my %url=(
-		ensembl_1   => "http://www.ebi.ac.uk/~mar/tools/lorem/data_for_download/$species.$ensembl_v/ensembl1.txt",
-		ensembl_2   => "http://www.ebi.ac.uk/~mar/tools/lorem/data_for_download/$species.$ensembl_v/ensembl2.txt",
-		prot_seq    => "http://www.ebi.ac.uk/~mar/tools/lorem/data_for_download/$species.$ensembl_v/prot_seq.tar.gz",
-		appris      => "http://www.ebi.ac.uk/~mar/tools/lorem/data_for_download/$species.$ensembl_v/appris_data.principal.txt"
+		ensembl_1   => "http://www.ebi.ac.uk/~mar/tools/switchseq/data_for_download/$species.$ensembl_v/ensembl1.txt",
+		ensembl_2   => "http://www.ebi.ac.uk/~mar/tools/switchseq/data_for_download/$species.$ensembl_v/ensembl2.txt",
+		prot_seq    => "http://www.ebi.ac.uk/~mar/tools/switchseq/data_for_download/$species.$ensembl_v/prot_seq.tar.gz",
+		appris      => "http://www.ebi.ac.uk/~mar/tools/switchseq/data_for_download/$species.$ensembl_v/appris_data.principal.txt"
 	);
 
 	## create directory structure

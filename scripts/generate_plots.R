@@ -3,7 +3,7 @@ for(i in 1:length(args)){
     eval(parse(text=args[[i]]))
 }
 
-library("Ipsum")
+library("tviz")
 
 ## functions
 getOutfile=function(outdir=outdir, plot_type=plot_type, gId=gId) {

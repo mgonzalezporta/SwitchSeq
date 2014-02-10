@@ -2,7 +2,7 @@
 
 =head1 SYNOPSIS
 
-lorem -t get_data [options]
+switchseq -t get_data [options]
 
 =head1 OPTIONS
 

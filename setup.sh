@@ -16,7 +16,7 @@ checkBin() {
         echo "   $1 - OK"
     else
         echo "   $1 - NOT FOUND"
-	echo "   Please install $1 manually (see https://github.com/mgonzalezporta/lorem/wiki/Setup-guide)"
+	echo "   Please install $1 manually (see https://github.com/mgonzalezporta/SwitchSeq/wiki/Setup-guide)"
     fi
 }
 
@@ -30,11 +30,11 @@ RSCRIPT`
     else
         echo "   $1 - NOT FOUND"
 	echo "   Installing $1..."
-	git clone https://github.com/mgonzalezporta/ipsum.git
-	cd ipsum/
-	R CMD build Ipsum
-	R CMD INSTALL Ipsum_1.0.tar.gz
-	rm Ipsum_1.0.tar.gz
+	git clone https://github.com/mgonzalezporta/tviz.git
+	cd tviz/
+	R CMD build Tviz
+	R CMD INSTALL Tviz_1.0.tar.gz
+	rm Tviz_1.0.tar.gz
     fi
 }
 
@@ -50,5 +50,5 @@ done
 echo "# Checking needle installation..."
 checkBin needle
 
-echo "# Checking R package Ipsum..."
-checkRPackage Ipsum
+echo "# Checking R package tviz..."
+checkRPackage tviz
