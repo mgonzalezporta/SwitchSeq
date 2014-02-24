@@ -6,17 +6,17 @@ checkPerlModule() {
         echo "   $1 - OK"
     else
         echo "   $1 - NOT FOUND"
-	echo "   Installing $1..."
+	    echo "   Installing $1..."
         perl -MCPAN -e "install $1"
     fi
 }
 
 checkBin() {
     if hash $1 2>/dev/null; then
-        echo "   $1 - OK"
+       echo "   $1 - OK"
     else
-        echo "   $1 - NOT FOUND"
-	echo "   Please install $1 manually (see https://github.com/mgonzalezporta/SwitchSeq/wiki/Setup-guide)"
+       echo "   $1 - NOT FOUND"
+	   echo "   Please install $1 manually (see https://github.com/mgonzalezporta/SwitchSeq/wiki/Setup-guide)"
     fi
 }
 
@@ -29,12 +29,12 @@ RSCRIPT`
         echo "   $1 - OK"
     else
         echo "   $1 - NOT FOUND"
-	echo "   Installing $1..."
-	git clone https://github.com/mgonzalezporta/tviz.git
-	cd tviz/
-	R CMD build Tviz
-	R CMD INSTALL Tviz_1.0.tar.gz
-	rm Tviz_1.0.tar.gz
+	    echo "   Installing $1..."
+    	git clone https://github.com/mgonzalezporta/tviz.git
+    	cd tviz/
+    	R CMD build tviz
+    	R CMD INSTALL tviz_1.0.tar.gz
+    	rm tviz_1.0.tar.gz
     fi
 }
 
