@@ -44,10 +44,12 @@ sub _get_file {
 	my $file=$dir."/".( split(/\//, $url) )[-1];
 
 	getstore($url, $file);
+
 	if ($file =~ /.tar.gz$/) {
 		my $fname=( split(/\//, $file) )[-1];
+	
 		system("cd $dir;
-			tar xzf $file;
+			tar xzf $fname;
 			rm $fname");
 	}
 }
