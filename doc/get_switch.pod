@@ -42,9 +42,9 @@ Ensembl version.
 
 =item B<** OPTIONAL **>
 
-=item B<--output> | B<-o> <dir>
+=item B<--out_dir> | B<-o> <dir>
 
-html output dir. [default: ./html]
+html output directory. [default: ./html]
 
 =item B<--data_dir> | B<-d> <dir>
 
