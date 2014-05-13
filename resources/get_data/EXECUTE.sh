@@ -2,8 +2,10 @@
 
 # HSA.70
 species=hsa
-ensembl_v=70
+ensembl_v=73
 outdir=/homes/mar/public_html/tools/switchseq/data_for_download
-path=http://jan2013.archive.ensembl.org/biomart/martservice?
-c="./get_data.sh $species $ensembl_v $outdir $path"
+biomart_path=http://sep2013.archive.ensembl.org/biomart/martservice?
+ensembl_api_path=/homes/mar/system/ensembl
+bioperl=/homes/mar/system/bioperl-live
+c="./get_data.sh $species $ensembl_v $outdir $biomart_path $ensembl_api_path $bioperl"
 bsub $c

@@ -5,6 +5,8 @@ species=$1
 ensembl_v=$2
 base_dir=$3
 path=$4
+ensembl_api_path=$5
+bioperl=$6
 
 ## dir structure
 outdir=$base_dir/$species.$ensembl_v
@@ -55,15 +57,7 @@ fi
 
 ## protein sequences
 echo "Retrieving protein sequences..."
-
-if [ ! -e /homes/mar/system/ensembl.$ensembl_v ]
-then
-	url=http://www.ensembl.org/cvsdownloads/ensembl-$ensembl_v.tar.gz
-	wget $url
-	tar xzf ensembl-$ensembl_v.tar.gz
-	rm ensembl-$ensembl_v.tar.gz
-	mv ensembl /homes/mar/system/ensembl.$ensembl_v
-fi
-
-perl get_prot_seq.pl $ensembl_v $species $outdir
+git --git-dir=$ensembl_api_path/.git --work-tree=$ensembl_api_path checkout release/$ensembl_v
+modules=$ensembl_api_path/modules
+perl get_prot_seq.pl $ensembl_v $modules $bioperl $species $outdir
 cd $outdir && tar czf prot_seq.tar.gz prot_seq/

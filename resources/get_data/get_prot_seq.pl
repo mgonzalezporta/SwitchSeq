@@ -4,18 +4,20 @@ use strict;
 use warnings;
 
 ## args
-my $species=$ARGV[1];
-my $outdir=$ARGV[2];
+my $species=$ARGV[3];
+my $outdir=$ARGV[4];
 
 ## ensembl api
 my $ensembl_v;
 my $modules;
+my $bioperl;
 BEGIN { 
 $ensembl_v=$ARGV[0];
-$modules="/homes/mar/system/ensembl.$ensembl_v/modules"; 
+$modules=$ARGV[1];
+$bioperl=$ARGV[2]; 
 }
 
-use lib "/homes/mar/system/bioperl-live";
+use lib "$bioperl";
 use lib "$modules";
 use Bio::EnsEMBL::Registry;
 
