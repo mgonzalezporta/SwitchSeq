@@ -86,7 +86,7 @@ sub _obtain_major_tx {
 		next if $.==1;
 
 		chomp ($row);
-		my @row=split(/ /, $row);
+		my @row=split(/\s+/, $row);
 		my $gId=$row[0];
 		my $tId=$row[1];
 		my $end=$#row-2;
