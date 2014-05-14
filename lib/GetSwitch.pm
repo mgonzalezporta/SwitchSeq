@@ -24,6 +24,7 @@ sub get_switch {
 	my $cond1=$ref_arguments->{'cond1'};
 	my $cond2=$ref_arguments->{'cond2'};
 	my $threshold_gexp=$ref_arguments->{'threshold_gexp'};
+	my $threshold_breadth=$ref_arguments->{'threshold_breadth'};
 
 	## prepare dir structure
 	_prepare_dir_structure($ref_arguments);
@@ -310,6 +311,7 @@ sub _find_switch {
 	my $cond2=$ref_arguments->{'cond2'};
 	my $ref_cond2=_adjust_columns($cond2);
 	my $threshold_gexp=$ref_arguments->{'threshold_gexp'};
+	my $threshold_breadth=$ref_arguments->{'threshold_breadth'};
 
 	foreach my $gId (keys %$ref_recurrent_tx) {
 		my $tId_cond1=$ref_recurrent_tx->{$gId}{'cond1'}{'recurrent_tx_id'};
@@ -326,7 +328,7 @@ sub _find_switch {
 			my $breadth_cond2=_get_exp_breadth($tExp_count_cond2, $gExp_count_cond2);
 
 			## report switch events
-			if ($breadth_cond1 > 50 and $breadth_cond2 > 50) {
+			if ($breadth_cond1 > $threshold_breadth and $breadth_cond2 > $threshold_breadth) {
 				$switch{$gId}{'C1.tId'}=$ref_recurrent_tx->{$gId}{'cond1'}{'recurrent_tx_id'};
 				$switch{$gId}{'C1.tExp'}=$tExp_count_cond1;
 				$switch{$gId}{'C1.gExp'}=$gExp_count_cond1;

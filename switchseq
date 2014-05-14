@@ -17,6 +17,7 @@ $arguments{'help'}=0;
 $arguments{'data_dir'}="./data";
 $arguments{'out_dir'}="./html";
 $arguments{'threshold_gexp'}=0.01;
+$arguments{'threshold_breadth'}=50;
 $arguments{'tool'}="";
 $arguments{'filt'}="NA";
 
@@ -32,6 +33,7 @@ GetOptions(
         'cond1|c1=s',
         'cond2|c2=s',
         'threshold_gexp|g=f',
+	'threshold_breadth|b=f'
 	'filt|f=s'
 ) or die pod2usage(
 	-input => "$Bin/doc/switchseq.pod",

@@ -56,9 +56,17 @@ Data directory containing information from Ensembl and APPRIS. [default: ./data]
 
 Gene expression threshold. [default: 0.01]
 
+=item B<--threshold_breadth> | B<-b> <float>
+
+Expression breadth threshold. [default: 50]
+
 =item B<--filt> | B<-f> <file>
 
 List of transcript ids that undergo differential usage across the studied conditions. [default: NA]
+
+The file must be in the following format, with no headers:
+
+gene_id transcript_id
 
 =back
 
