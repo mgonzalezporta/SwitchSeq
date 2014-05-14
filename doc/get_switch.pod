@@ -24,6 +24,8 @@ Eg, for an experiment with 3 controls and 3 KO, column names could be the follow
 
 gene_id transcript_id C1 C2 C3 KO1 KO2 KO3
 
+Fields can be delimited by any number of spaces or tabs.
+
 =item B<--cond1> | B<-c1> <interval>
 
 Columns for condition 1. [example: --cond1 3-5]
