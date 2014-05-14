@@ -25,6 +25,7 @@ sub get_switch {
 	my $cond2=$ref_arguments->{'cond2'};
 	my $threshold_gexp=$ref_arguments->{'threshold_gexp'};
 	my $threshold_breadth=$ref_arguments->{'threshold_breadth'};
+	my $filt=$ref_arguments->{'filt'};
 
 	## prepare dir structure
 	_prepare_dir_structure($ref_arguments);
@@ -37,6 +38,10 @@ sub get_switch {
 	#print Dumper %$ref_major_tx;
 	my $ref_recurrent_major_tx=_obtain_recurrent_major_tx($ref_major_tx, $ref_arguments);
 	#print Dumper %$ref_recurrent_major_tx;
+	if ($filt ne "NA" ) {
+		my $ref_recurrent_major_tx=_filt_recurrent_major_tx($ref_recurrent_major_tx, $ref_arguments);
+		#print Dumper %$ref_filt_recurrent_major_tx;
+	}
 	my $ref_switch=_obtain_switch_events($ref_major_tx, $ref_recurrent_major_tx, $ref_arguments);
 	#print Dumper %$ref_switch;
 
@@ -169,6 +174,32 @@ sub _get_most_recurrent_tx {
 		$result{'recurrent_tx_count'}=$count{$recurrent_tx_id};
 	}
 	return \%result;
+}
+
+sub _filt_recurrent_major_tx {
+        my $ref_recurrent_major_tx=$_[0];
+        my $ref_arguments=$_[1];
+	my $input=$ref_arguments->{'filt'};
+	
+	my %filt;
+	open (INPUT, "< $input") or die "Could not open $input: $!";
+		while( my $row = <INPUT>)  {
+			chomp ($row);
+			my @row=split(/\s+/, $row);
+			my $tId=$row[1];	
+			$filt{$tId}++;
+	}
+	close (INPUT);
+
+	foreach my $gId (keys %$ref_recurrent_major_tx) {
+		my $tId_cond1=$ref_recurrent_major_tx->{$gId}{'cond1'}{'recurrent_tx_id'};
+		my $tId_cond2=$ref_recurrent_major_tx->{$gId}{'cond2'}{'recurrent_tx_id'};
+		
+		unless (defined( $filt{$tId_cond1} ) or defined( $filt{$tId_cond2} )) {
+			delete $ref_recurrent_major_tx->{$gId};
+		}
+	}
+	return $ref_recurrent_major_tx;
 }
 
 sub _obtain_switch_events {
