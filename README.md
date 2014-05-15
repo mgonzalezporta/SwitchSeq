@@ -1,7 +1,7 @@
 ## SwitchSeq
 When working with RNA-seq data, several tools exist to quantify differences in splicing across conditions and to address the significance of those changes (e.g. [DEXSeq](http://www.bioconductor.org/packages/release/bioc/html/DEXSeq.html), [MMDIFF](http://www.ncbi.nlm.nih.gov/pubmed/24281695)). Quiet often though, these tools result in a long list of genes that is difficult to interpret. By relying on transcript level quantifications, SwitchSeq provides a simple (yet powerful) approach to identify, annotate and visualise the most extreme changes in splicing across two different conditions, namely **switch events**. In brief, switch events are defined as those cases where, for a given gene, the identity of the most abundant transcript changes across conditions:
 
-![SwitchSeq overview](/doc/fig1.pdf)
+![SwitchSeq overview](/doc/fig1.png)
 
 
 ## Quick navigation
