@@ -1,6 +1,5 @@
-#!/usr/bin/perl
 
-package GetSwitch;
+#ckage GetSwitch;
 use strict;
 use warnings;
 use Exporter;
@@ -44,6 +43,7 @@ sub get_switch {
 	}
 	my $ref_switch=_obtain_switch_events($ref_major_tx, $ref_recurrent_major_tx, $ref_arguments);
 	#print Dumper %$ref_switch;
+	# $ref_major_tx needed for the gExp slot
 
 	## print output
 	_print_txt($ref_switch, $ref_arguments);
@@ -228,6 +228,9 @@ sub _obtain_switch_events {
 		$ref_appris=_load_appris($appris_input);
 	}
 
+	## check that genes/transcritps are coding in the provided annotation
+	$ref_recurrent_major_tx = _filt_annotation($ref_recurrent_major_tx, $ref_ensembl, $ref_arguments);
+
 	## find and annotate
 	my $ref_switch=_find_switch($ref_major_tx, $ref_recurrent_major_tx, $ref_arguments);
 	
@@ -292,6 +295,39 @@ sub _load_appris {
         close (INPUT);
    
         return \%appris;
+}
+
+sub _filt_annotation {
+	my $ref_recurrent_major_tx=$_[0];
+	my $ref_ensembl=$_[1];
+	my $ref_arguments=$_[2];
+	
+	my $out_dir=$ref_arguments->{'out_dir'};
+	my $output="$out_dir/data/skipped.txt";
+	my %skipped;
+
+	foreach my $gId (keys %$ref_recurrent_major_tx) {
+		my $tId_cond1=$ref_recurrent_major_tx->{$gId}{'cond1'}{'recurrent_tx_id'};
+		my $tId_cond2=$ref_recurrent_major_tx->{$gId}{'cond2'}{'recurrent_tx_id'};
+		
+		if ( !defined($ref_ensembl->{$gId}) 
+			or !defined($ref_ensembl->{$gId}{'transcripts'}{$tId_cond1})
+			or !defined($ref_ensembl->{$gId}{'transcripts'}{$tId_cond2}) ) {
+				delete $ref_recurrent_major_tx->{$gId};
+				$skipped{$gId}{'cond1'}{'recurrent_tx_id'}=$tId_cond1;
+				$skipped{$gId}{'cond2'}{'recurrent_tx_id'}=$tId_cond2;
+		}
+	}
+
+	if (keys %skipped > 0) {
+		open(OUT, ">$output") or die "Cannot open $output: $!";
+		foreach my $gId (keys %skipped) {
+			print OUT "$gId $skipped{$gId}{'cond1'}{'recurrent_tx_id'} $skipped{$gId}{'cond2'}{'recurrent_tx_id'}\n";
+		}
+		close(OUT);
+	}
+
+	return $ref_recurrent_major_tx;
 }
 
 sub _get_header {
