@@ -4,6 +4,11 @@ When working with RNA-seq data, several tools exist to quantify differences in s
 ![SwitchSeq overview](/doc/fig1.png)
 
 
+*Identification, annotation and visualisation of extreme changes in splicing from RNA-seq experiments with SwitchSeq.*
+Mar Gonzàlez-Porta, Alvis Brazma.
+[Available in bioRxiv](http://dx.doi.org/10.1101/005967).
+
+
 ## Quick navigation
 * [Setup guide](https://github.com/mgonzalezporta/switchseq/wiki/Setup-guide)
 * [Tutorial](https://github.com/mgonzalezporta/switchseq/wiki/Tutorial)
