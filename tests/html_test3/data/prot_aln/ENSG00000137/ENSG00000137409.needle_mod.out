@@ -1,6 +1,6 @@
 ########################################
 # Program: needle
-# Rundate: Thu 23 Jan 2014 11:23:50
+# Rundate: Thu 31 Jul 2014 17:44:47
 # Commandline: needle
 #    [-asequence] ./data_annot/hsa.66/prot_seq/ENST00000373/ENST00000373616.fa
 #    [-bsequence] ./data_annot/hsa.66/prot_seq/ENST00000373/ENST00000373627.fa

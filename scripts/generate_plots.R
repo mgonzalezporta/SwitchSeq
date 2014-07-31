@@ -39,10 +39,10 @@ if (filt != "NA") {
 ## create TranscriptExpressionSet object
 tes=newTranscriptExpressionSet(
         gId=gId,
-        texp=texp,
+        texp=texp$texp,
         biotypes=biotypes,
-        cond1=cond1,
-        cond2=cond2,
+        cond1=texp$cond1,
+        cond2=texp$cond2,
         significant_events=significant_events
 )
 

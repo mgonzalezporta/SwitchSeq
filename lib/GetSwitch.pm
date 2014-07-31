@@ -1,5 +1,6 @@
+#!/usr/bin/perl
 
-#ckage GetSwitch;
+package GetSwitch;
 use strict;
 use warnings;
 use Exporter;
@@ -8,6 +9,7 @@ use Text::Template;
 use FindBin qw($Bin);
 use Data::Dumper;
 use JSON;
+# use Statistics::Basic;
 
 our @ISA= qw( Exporter );
 our @EXPORT = qw( get_switch );
@@ -33,17 +35,19 @@ sub get_switch {
 	print "# Obtaining and annotating alternative splicing switch events...\n";
 
 	## calculations
-	my $ref_major_tx=_obtain_major_tx($input);
-	#print Dumper %$ref_major_tx;
-	my $ref_recurrent_major_tx=_obtain_recurrent_major_tx($ref_major_tx, $ref_arguments);
-	#print Dumper %$ref_recurrent_major_tx;
+	my ($ref_samples, $ref_major_tx)=_obtain_major_tx($input);
+	# print Dumper %$ref_major_tx;
+	# print Dumper @$ref_samples;
+
+	my $ref_recurrent_major_tx=_obtain_recurrent_major_tx($ref_major_tx, $ref_arguments, $ref_samples);
+	# print Dumper %$ref_recurrent_major_tx;
 	if ($filt ne "NA" ) {
 		my $ref_recurrent_major_tx=_filt_recurrent_major_tx($ref_recurrent_major_tx, $ref_arguments);
 		#print Dumper %$ref_filt_recurrent_major_tx;
 	}
-	my $ref_switch=_obtain_switch_events($ref_major_tx, $ref_recurrent_major_tx, $ref_arguments);
-	#print Dumper %$ref_switch;
-	# $ref_major_tx needed for the gExp slot
+
+	my $ref_switch=_obtain_switch_events($ref_recurrent_major_tx, $ref_arguments);
+	# print Dumper %$ref_switch;
 
 	## print output
 	_print_txt($ref_switch, $ref_arguments);
@@ -86,42 +90,48 @@ sub _obtain_major_tx {
 		# gId => | major_tx_id  => [@columns]
 		#	     | major_tx_exp => [@columns]
 		#        | gExp         => [@columns]
+	my @samples;
 
 	open (INPUT, "< $input") or die "Could not open $input: $!";
 	while( my $row = <INPUT>)  {
-		next if $.==1;
-
 		chomp ($row);
 		my @row=split(/\s+/, $row);
-		my $gId=$row[0];
-		my $tId=$row[1];
-		my $end=$#row-2;
-		my $length=$end+1;
 
-		# initialise vectors if it's the first time you see the gene
-		if (!defined $major_tx{$gId}) {
-			@{ $major_tx{$gId}{'major_tx_id'} }=('NA') x $length;
-			@{ $major_tx{$gId}{'major_tx_exp'} }=(0) x $length;
-			@{ $major_tx{$gId}{'gExp'} }=(0) x $length;
-		}
-		
-		for my $i (0..$end) {
-			@{ $major_tx{$gId}{'gExp'} }[$i]+=$row[$i+2];
-			if ($major_tx{$gId}{'major_tx_exp'}[$i] < $row[$i+2]) {
-				@{ $major_tx{$gId}{'major_tx_exp'} }[$i]=$row[$i+2];
-				@{ $major_tx{$gId}{'major_tx_id'} }[$i]=$tId;
+		if ($.==1) {
+			splice @row, 0, 2;
+			@samples=@row;
+		} else {
+			my $gId=$row[0];
+			my $tId=$row[1];
+			my $end=$#row-2;
+			my $length=$end+1;
+
+			# initialise vectors if it's the first time you see the gene
+			if (!defined $major_tx{$gId}) {
+				@{ $major_tx{$gId}{'major_tx_id'} }=('NA') x $length;
+				@{ $major_tx{$gId}{'major_tx_exp'} }=(0) x $length;
+				@{ $major_tx{$gId}{'gExp'} }=(0) x $length;
+			}
+			
+			for my $i (0..$end) {
+				@{ $major_tx{$gId}{'gExp'} }[$i]+=$row[$i+2];
+				if ($major_tx{$gId}{'major_tx_exp'}[$i] < $row[$i+2]) {
+					@{ $major_tx{$gId}{'major_tx_exp'} }[$i]=$row[$i+2];
+					@{ $major_tx{$gId}{'major_tx_id'} }[$i]=$tId;
+				}
 			}
 		}
 	}
 	close (INPUT);
 
-	return \%major_tx;
+	return (\@samples, \%major_tx);
 }
 
 sub _obtain_recurrent_major_tx {
 	## obtain the most recurrent major transcripts in each condition
 	my $ref_major_tx=$_[0];
 	my $ref_arguments=$_[1];
+	my $ref_samples=$_[2];
 
 	my $cond1=$ref_arguments->{'cond1'};
 	my $ref_cond1=_adjust_columns($cond1);
@@ -131,22 +141,48 @@ sub _obtain_recurrent_major_tx {
 	my %recurrent_tx;
 		# gId => | cond1 => | recurrent_tx_id
 		#                   | recurrent_tx_count
+		#					| gExp
 		# 		 | cond2 => | recurrent_tx_id
 		# 		            | recurrent_tx_count
+		#					| gExp
+	my $out_dir=$ref_arguments->{'out_dir'};
+	my $output="$out_dir/data/skipped.technical_replicates.txt";
+	my $ref_skipped_cond1;
+	my $ref_skipped_cond2;
+	my %skipped;
 
+	## get most recurrent major tx per condition
 	foreach my $gId (keys %$ref_major_tx) {
 		my %subset_major_tx=%{ $ref_major_tx->{$gId} };
 
-		$recurrent_tx{$gId}{'cond1'}=_get_most_recurrent_tx(\%subset_major_tx, $ref_cond1, $threshold_gexp);
-		$recurrent_tx{$gId}{'cond2'}=_get_most_recurrent_tx(\%subset_major_tx, $ref_cond2, $threshold_gexp);
+		($recurrent_tx{$gId}{'cond1'}, $ref_skipped_cond1)=_get_most_recurrent_tx(\%subset_major_tx, 
+			$ref_cond1, $threshold_gexp, $ref_samples);
+		($recurrent_tx{$gId}{'cond2'}, $ref_skipped_cond2)=_get_most_recurrent_tx(\%subset_major_tx, 
+			$ref_cond2, $threshold_gexp, $ref_samples);
+
+		if (%$ref_skipped_cond1 or %$ref_skipped_cond2) {
+			%{$skipped{$gId}} = (%$ref_skipped_cond1, %$ref_skipped_cond2);
+		}		
 	}
 
-	# if any of the conditions doesn't have any transcript expressed, discard the whole gene
+	## if any of the conditions doesn't have any transcript expressed, discard the whole gene
 	foreach my $gId (keys %recurrent_tx) {
 		if (! defined($recurrent_tx{$gId}{'cond1'}{'recurrent_tx_id'}) or
 			! defined($recurrent_tx{$gId}{'cond2'}{'recurrent_tx_id'})) {
 			delete $recurrent_tx{$gId};
+			delete $skipped{$gId};
 		}
+	}
+
+	## report skipped cases - disagreement between technical replicates
+	if (keys %skipped > 0) {
+		open(OUT, ">$output") or die "Cannot open $output: $!";
+		foreach my $gId (keys %skipped) {
+			foreach my $sId (keys %{$skipped{$gId}}) {
+				print OUT "$gId $sId $skipped{$gId}{$sId}\n";
+			}
+		}
+		close(OUT);
 	}
 
 	return \%recurrent_tx;
@@ -156,15 +192,41 @@ sub _get_most_recurrent_tx {
 	my $ref_subset_major_tx=$_[0];
 	my $ref_columns=$_[1];	
 	my $threshold_gexp=$_[2];
+	my $ref_samples=$_[3];
+	my %major_tx;
 	my %count;
 	my %result;
+	my %skipped;
+	my @new_gExp;
+
+	## retrieve major tx across all replicates (including technical ones)
+	foreach my $i (@$ref_columns) {
+		my $gExp=@{ $ref_subset_major_tx->{'gExp'} }[$i];
+		if ($gExp >= $threshold_gexp) {
+			my $sId=@{$ref_samples}[$i];
+			my $tId=@{ $ref_subset_major_tx->{'major_tx_id'} }[$i];
+
+			push(@{$major_tx{$sId}{'tIds'}}, $tId);
+			push(@{$major_tx{$sId}{'gExp'}}, $gExp);
+		}
+	}
 
 	## count how many times each transcript is detected as major
-	foreach my $i (@$ref_columns) {
-		if (@{ $ref_subset_major_tx->{'gExp'} }[$i] >= $threshold_gexp) {
-			my $tId=@{ $ref_subset_major_tx->{'major_tx_id'} }[$i];
-			$count{$tId}++;
+	## for technical replicates, the major transcript has to be the same
+	foreach my $sId (keys %major_tx) {
+		my %tIds = map { $_, 1 } @{ $major_tx{$sId}{'tIds'} };
+		if (keys %tIds == 1) {
+	 		## if all are equal
+	 		my $tId=(keys %tIds)[0];
+	 		$count{$tId}++;
+		} else {
+			my $tIds=join(",", @{ $major_tx{$sId}{'tIds'} });
+			$skipped{$sId} = $tIds;
 		}
+
+ 		## update gExp - take the median regardless on whether major tx predictions agree
+ 		my $m=median(@{$major_tx{$sId}{'gExp'}});
+ 		push @new_gExp, $m;
 	}
 
 	## get the transcript with the highest count
@@ -172,13 +234,15 @@ sub _get_most_recurrent_tx {
 	if (defined $recurrent_tx_id) {
 		$result{'recurrent_tx_id'}=$recurrent_tx_id;
 		$result{'recurrent_tx_count'}=$count{$recurrent_tx_id};
+		@{ $result{'gExp'} }=@new_gExp;
 	}
-	return \%result;
+
+	return (\%result, \%skipped);
 }
 
 sub _filt_recurrent_major_tx {
-        my $ref_recurrent_major_tx=$_[0];
-        my $ref_arguments=$_[1];
+    my $ref_recurrent_major_tx=$_[0];
+    my $ref_arguments=$_[1];
 	my $input=$ref_arguments->{'filt'};
 	
 	my %filt;
@@ -203,9 +267,8 @@ sub _filt_recurrent_major_tx {
 }
 
 sub _obtain_switch_events {
-	my $ref_major_tx=$_[0];
-	my $ref_recurrent_major_tx=$_[1];
-	my $ref_arguments=$_[2];
+	my $ref_recurrent_major_tx=$_[0];
+	my $ref_arguments=$_[1];
 
 	my $data_dir=$ref_arguments->{'data_dir'};
 	my $species=$ref_arguments->{'species'};
@@ -232,7 +295,7 @@ sub _obtain_switch_events {
 	$ref_recurrent_major_tx = _filt_annotation($ref_recurrent_major_tx, $ref_ensembl, $ref_arguments);
 
 	## find and annotate
-	my $ref_switch=_find_switch($ref_major_tx, $ref_recurrent_major_tx, $ref_arguments);
+	my $ref_switch=_find_switch($ref_recurrent_major_tx, $ref_arguments);
 	
 	$ref_switch=_annotate_switch($ref_switch, $ref_ensembl, $ref_appris, $ref_arguments);
 	return $ref_switch;
@@ -303,13 +366,15 @@ sub _filt_annotation {
 	my $ref_arguments=$_[2];
 	
 	my $out_dir=$ref_arguments->{'out_dir'};
-	my $output="$out_dir/data/skipped.txt";
+	my $output="$out_dir/data/skipped.annotation.txt";
 	my %skipped;
 
 	foreach my $gId (keys %$ref_recurrent_major_tx) {
 		my $tId_cond1=$ref_recurrent_major_tx->{$gId}{'cond1'}{'recurrent_tx_id'};
 		my $tId_cond2=$ref_recurrent_major_tx->{$gId}{'cond2'}{'recurrent_tx_id'};
 		
+		## identify genes/transcripts that are not present in the annotation
+		## (e.g. non-protein-coding genes)
 		if ( !defined($ref_ensembl->{$gId}) 
 			or !defined($ref_ensembl->{$gId}{'transcripts'}{$tId_cond1})
 			or !defined($ref_ensembl->{$gId}{'transcripts'}{$tId_cond2}) ) {
@@ -368,9 +433,8 @@ sub _get_header {
 }
 
 sub _find_switch {
-	my $ref_major_tx=$_[0];
-	my $ref_recurrent_tx=$_[1];
-	my $ref_arguments=$_[2];
+	my $ref_recurrent_tx=$_[0];
+	my $ref_arguments=$_[1];
 	
 	my %switch;
 	my $cond1=$ref_arguments->{'cond1'};
@@ -387,11 +451,11 @@ sub _find_switch {
 		if ( $tId_cond1 ne $tId_cond2) {
 			## calculate major transcript expression breadth
 			my $tExp_count_cond1=$ref_recurrent_tx->{$gId}{'cond1'}{'recurrent_tx_count'};
-			my $gExp_count_cond1=_get_gexp_count([ @{ $ref_major_tx->{$gId}{'gExp'} }[@$ref_cond1] ], $threshold_gexp);
+			my $gExp_count_cond1=_get_gexp_count([ @{ $ref_recurrent_tx->{$gId}{'cond1'}{'gExp'} } ], $threshold_gexp);
 			my $breadth_cond1=_get_exp_breadth($tExp_count_cond1, $gExp_count_cond1);
 
 			my $tExp_count_cond2=$ref_recurrent_tx->{$gId}{'cond2'}{'recurrent_tx_count'};
-			my $gExp_count_cond2=_get_gexp_count([ @{ $ref_major_tx->{$gId}{'gExp'} }[@$ref_cond2] ], $threshold_gexp);
+			my $gExp_count_cond2=_get_gexp_count([ @{ $ref_recurrent_tx->{$gId}{'cond2'}{'gExp'} } ], $threshold_gexp);
 			my $breadth_cond2=_get_exp_breadth($tExp_count_cond2, $gExp_count_cond2);
 
 			## report switch events
@@ -720,4 +784,17 @@ sub _fill_template {
 	close (OUT);
 }
 
+sub median
+{
+    my @vals = sort {$a <=> $b} @_;
+    my $len = @vals;
+    if($len%2) #odd?
+    {
+        return $vals[int($len/2)];
+    }
+    else #even
+    {
+        return ($vals[int($len/2)-1] + $vals[int($len/2)])/2;
+    }
+}
 1;

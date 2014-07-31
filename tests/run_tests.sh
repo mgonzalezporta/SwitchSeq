@@ -18,3 +18,12 @@ switchseq -t get_switch \
 	-f ./data_test2/significant_dtu.txt \
 	-o ./html_test2 \
 	-c1 3-14 -c2 15-26
+
+## test3: get_switch - 4+4 samples (with technical replicates)
+echo "Running test 3..."
+switchseq -t get_switch \
+        -s hsa -e 66 \
+        -d ./data_annot \
+        -i ./data_test3/expdata.txt \
+        -o ./html_test3 \
+        -c1 3-7 -c2 8-12
