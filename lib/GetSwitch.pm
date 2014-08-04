@@ -222,12 +222,12 @@ sub _get_most_recurrent_tx {
 		my $gExp=@{ $ref_subset_major_tx->{'gExp'} }[$i];
 		my $exp_second=@{ $ref_subset_major_tx->{'second_tx_exp'} }[$i];
 		my $exp_major=@{ $ref_subset_major_tx->{'major_tx_exp'} }[$i];
-		my $dominance=$exp_second/$exp_major;
 
 		if ($gExp >= $threshold_gexp) {
 			my $sId=@{$ref_samples}[$i];
 			push(@{$major_tx{$sId}{'gExp'}}, $gExp);
 
+			my $dominance=$exp_second/$exp_major;
 			if ($dominance <= $threshold_dominance) {
 				my $tId=@{ $ref_subset_major_tx->{'major_tx_id'} }[$i];
 				push(@{$major_tx{$sId}{'tIds'}}, $tId);
