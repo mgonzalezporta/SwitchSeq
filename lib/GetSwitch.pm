@@ -202,6 +202,7 @@ sub _get_most_recurrent_tx {
 	## retrieve major tx across all replicates (including technical ones)
 	foreach my $i (@$ref_columns) {
 		my $gExp=@{ $ref_subset_major_tx->{'gExp'} }[$i];
+		## filter dominance here
 		if ($gExp >= $threshold_gexp) {
 			my $sId=@{$ref_samples}[$i];
 			my $tId=@{ $ref_subset_major_tx->{'major_tx_id'} }[$i];
