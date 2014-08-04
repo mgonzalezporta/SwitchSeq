@@ -89,6 +89,8 @@ sub _obtain_major_tx {
 	my %major_tx;
 		# gId => | major_tx_id  => [@columns]
 		#	     | major_tx_exp => [@columns]
+		#        | second_tx_exp => [@columns]
+		# 				abundance for the 2nd tx in the ranking
 		#        | gExp         => [@columns]
 	my @samples;
 
@@ -110,14 +112,28 @@ sub _obtain_major_tx {
 			if (!defined $major_tx{$gId}) {
 				@{ $major_tx{$gId}{'major_tx_id'} }=('NA') x $length;
 				@{ $major_tx{$gId}{'major_tx_exp'} }=(0) x $length;
+				@{ $major_tx{$gId}{'second_tx_exp'} }=(0) x $length;
 				@{ $major_tx{$gId}{'gExp'} }=(0) x $length;
 			}
 			
 			for my $i (0..$end) {
 				@{ $major_tx{$gId}{'gExp'} }[$i]+=$row[$i+2];
+
+				# if exp value is higher than major tx, update both major and second tx
 				if ($major_tx{$gId}{'major_tx_exp'}[$i] < $row[$i+2]) {
+					# old major tx is now the second in the ranking
+					@{ $major_tx{$gId}{'second_tx_exp'} }[$i]=@{ $major_tx{$gId}{'major_tx_exp'} }[$i];
+
+					# update major tx
 					@{ $major_tx{$gId}{'major_tx_exp'} }[$i]=$row[$i+2];
 					@{ $major_tx{$gId}{'major_tx_id'} }[$i]=$tId;
+
+				# otherwise update just the second if it's still higher than that
+				} else {
+					
+					if (@{ $major_tx{$gId}{'second_tx_exp'} }[$i] < $row[$i+2]) {
+						@{ $major_tx{$gId}{'second_tx_exp'} }[$i]=$row[$i+2];
+					}			
 				}
 			}
 		}
@@ -138,6 +154,7 @@ sub _obtain_recurrent_major_tx {
 	my $cond2=$ref_arguments->{'cond2'};
 	my $ref_cond2=_adjust_columns($cond2);
 	my $threshold_gexp=$ref_arguments->{'threshold_gexp'};
+	my $threshold_dominance=$ref_arguments->{'threshold_dominance'};
 	my %recurrent_tx;
 		# gId => | cond1 => | recurrent_tx_id
 		#                   | recurrent_tx_count
@@ -156,9 +173,9 @@ sub _obtain_recurrent_major_tx {
 		my %subset_major_tx=%{ $ref_major_tx->{$gId} };
 
 		($recurrent_tx{$gId}{'cond1'}, $ref_skipped_cond1)=_get_most_recurrent_tx(\%subset_major_tx, 
-			$ref_cond1, $threshold_gexp, $ref_samples);
+			$ref_cond1, $threshold_gexp, $threshold_dominance, $ref_samples);
 		($recurrent_tx{$gId}{'cond2'}, $ref_skipped_cond2)=_get_most_recurrent_tx(\%subset_major_tx, 
-			$ref_cond2, $threshold_gexp, $ref_samples);
+			$ref_cond2, $threshold_gexp, $threshold_dominance, $ref_samples);
 
 		if (%$ref_skipped_cond1 or %$ref_skipped_cond2) {
 			%{$skipped{$gId}} = (%$ref_skipped_cond1, %$ref_skipped_cond2);
@@ -192,7 +209,8 @@ sub _get_most_recurrent_tx {
 	my $ref_subset_major_tx=$_[0];
 	my $ref_columns=$_[1];	
 	my $threshold_gexp=$_[2];
-	my $ref_samples=$_[3];
+	my $threshold_dominance=$_[3];
+	my $ref_samples=$_[4];
 	my %major_tx;
 	my %count;
 	my %result;
@@ -202,13 +220,18 @@ sub _get_most_recurrent_tx {
 	## retrieve major tx across all replicates (including technical ones)
 	foreach my $i (@$ref_columns) {
 		my $gExp=@{ $ref_subset_major_tx->{'gExp'} }[$i];
-		## filter dominance here
+		my $exp_second=@{ $ref_subset_major_tx->{'second_tx_exp'} }[$i];
+		my $exp_major=@{ $ref_subset_major_tx->{'major_tx_exp'} }[$i];
+		my $dominance=$exp_second/$exp_major;
+
 		if ($gExp >= $threshold_gexp) {
 			my $sId=@{$ref_samples}[$i];
-			my $tId=@{ $ref_subset_major_tx->{'major_tx_id'} }[$i];
-
-			push(@{$major_tx{$sId}{'tIds'}}, $tId);
 			push(@{$major_tx{$sId}{'gExp'}}, $gExp);
+
+			if ($dominance <= $threshold_dominance) {
+				my $tId=@{ $ref_subset_major_tx->{'major_tx_id'} }[$i];
+				push(@{$major_tx{$sId}{'tIds'}}, $tId);
+			}
 		}
 	}
 
@@ -409,7 +432,7 @@ sub _get_header {
 	push(@header, "C1.tId:major_transcript_-_condition_1 ");
 	push(@header, "C1.principal:is_the_transcript_classified_as_principal_in_APPRIS?_-_condition_1 ");
 	push(@header, "C1.biotype:major_transcript_biotype_-_condition_1 ");
-	push(@header, "C1.tExp:in_how_many_samples_is_the_transcript_detected_as_major?_-_condition_1 ");
+	push(@header, "C1.tExp:in_how_many_samples_is_the_transcript_detected_as_dominant?_-_condition_1 ");
 	push(@header, "C1.gExp:in_how_many_samples_is_the_gene_expressed?_-_condition_1 ");
 	push(@header, "C1.breadth:major_transcript_expression_breadth_-_condition_1 ");
 
@@ -417,7 +440,7 @@ sub _get_header {
 	push(@header, "C2.tId:major_transcript_-_condition_2 ");
 	push(@header, "C2.principal:is_the_transcript_classified_as_principal_in_APPRIS?_-_condition_2 ");
 	push(@header, "C2.biotype:major_transcript_biotype_-_condition_2 ");
-	push(@header, "C2.tExp:in_how_many_samples_is_the_transcript_detected_as_major?_-_condition_2 ");
+	push(@header, "C2.tExp:in_how_many_samples_is_the_transcript_detected_as_dominant?_-_condition_2 ");
 	push(@header, "C2.gExp:in_how_many_samples_is_the_gene_expressed?_-_condition_2 ");
 	push(@header, "C2.breadth:major_transcript_expression_breadth_-_condition_2 ");
 

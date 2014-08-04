@@ -18,6 +18,7 @@ $arguments{'data_dir'}="./data";
 $arguments{'out_dir'}="./html";
 $arguments{'threshold_gexp'}=0.01;
 $arguments{'threshold_breadth'}=50;
+$arguments{'threshold_dominance'}=1;
 $arguments{'tool'}="";
 $arguments{'filt'}="NA";
 
@@ -25,15 +26,16 @@ GetOptions(
 	\%arguments, 
 	'help|h',
 	'tool|t=s',
-        'data_dir|d:s',
-        'species|s:s',
-        'ensembl_v|e:i',
-        'input|i=s',
-        'out_dir|o=s',
-        'cond1|c1=s',
-        'cond2|c2=s',
-        'threshold_gexp|g=f',
+    'data_dir|d:s',
+    'species|s:s',
+    'ensembl_v|e:i',
+    'input|i=s',
+    'out_dir|o=s',
+    'cond1|c1=s',
+    'cond2|c2=s',
+    'threshold_gexp|g=f',
 	'threshold_breadth|b=f',
+	'threshold_dominance|dom=f',
 	'filt|f=s'
 ) or die pod2usage(
 	-input => "$Bin/doc/switchseq.pod",
