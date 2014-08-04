@@ -20,11 +20,12 @@ Input file. Columns have to be specified as follows:
 gene_id (1)
 transcript_id (2)
 transcript expression levels in each sample (3-).
-Eg, for an experiment with 3 controls and 3 KO, column names could be the following:
+E.g., for an experiment with 3 controls and 3 KO, column names could be the following:
 
 gene_id transcript_id C1 C2 C3 KO1 KO2 KO3
 
 Fields can be delimited by any number of spaces or tabs.
+Technical replicates are supported. Those are automatically detected by SwitchSeq whenever non-unique column names are used.
 
 =item B<--cond1> | B<-c1> <interval>
 
