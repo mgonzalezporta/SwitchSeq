@@ -585,7 +585,7 @@ sub _get_prot_identity {
 	foreach my $row (@needle_output) {
 		print OUT $row;
 
-		if ($row =~ /# Identity.+\((\d+\.\d+)/) {
+		if ($row =~ /# Identity.+\((\s*\d+\.\d+)/) {
 			$pIdentity=$1;
 		}
 	}
