@@ -8,7 +8,7 @@ When working with RNA-seq data, several tools exist to quantify differences in s
 Mar Gonzàlez-Porta, Alvis Brazma.
 [Available in bioRxiv](http://dx.doi.org/10.1101/005967).
 
-[Check also some slides available in Slideshare](http://www.slideshare.net/MarGonzlezPorta/identification-annotation-and-visualisation-of-extreme-changes-in-splicing-with-switchseq)
+[Related slides available in Slideshare](http://www.slideshare.net/MarGonzlezPorta/identification-annotation-and-visualisation-of-extreme-changes-in-splicing-with-switchseq)
 
 ## Quick navigation
 * [Setup guide](https://github.com/mgonzalezporta/switchseq/wiki/Setup-guide)
