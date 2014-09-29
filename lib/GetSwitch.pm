@@ -325,7 +325,9 @@ sub _obtain_switch_events {
 	## find and annotate
 	my $ref_switch=_find_switch($ref_recurrent_major_tx, $ref_arguments);
 	
-	$ref_switch=_annotate_switch($ref_switch, $ref_ensembl, $ref_appris, $ref_arguments);
+	if ($custom_annot eq "FALSE") {
+		$ref_switch=_annotate_switch($ref_switch, $ref_ensembl, $ref_appris, $ref_arguments);
+	}
 	return $ref_switch;
 }
 
@@ -538,7 +540,7 @@ sub _annotate_switch {
 	        $ref_switch->{$gId}{'C2.principal'}=_is_principal( $ref_switch->{$gId}{'C2.tId'}, $ref_appris );
 	        $ref_switch->{$gId}{'C1.biotype'}=_get_tx_biotype( $gId, $ref_switch->{$gId}{'C1.tId'}, $ref_ensembl );
 	        $ref_switch->{$gId}{'C2.biotype'}=_get_tx_biotype( $gId, $ref_switch->{$gId}{'C2.tId'}, $ref_ensembl );
-		$ref_switch->{$gId}{'rank'}=_calculate_rank( $ref_switch->{$gId} );	 		
+			$ref_switch->{$gId}{'rank'}=_calculate_rank( $ref_switch->{$gId} );	 		
 	        $ref_switch->{$gId}{'pIdentity'}="NA";
 	    	$ref_switch->{$gId}{'pdbEntry'}="NO";
 	
