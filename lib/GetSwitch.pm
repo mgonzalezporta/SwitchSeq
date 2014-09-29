@@ -296,6 +296,7 @@ sub _obtain_switch_events {
 
 	my $data_dir=$ref_arguments->{'data_dir'};
 	my $species=$ref_arguments->{'species'};
+	my $custom_annot=$ref_arguments->{'custom_annot'};
 	my $ensembl_v=$ref_arguments->{'ensembl_v'};
 	my $out_dir=$ref_arguments->{'out_dir'};
 	my $output="$out_dir/switch.txt";
@@ -316,7 +317,10 @@ sub _obtain_switch_events {
 	}
 
 	## check that genes/transcritps are coding in the provided annotation
-	$ref_recurrent_major_tx = _filt_annotation($ref_recurrent_major_tx, $ref_ensembl, $ref_arguments);
+	print $custom_annot;
+	unless ($custom_annot eq "FALSE") {
+		$ref_recurrent_major_tx = _filt_annotation($ref_recurrent_major_tx, $ref_ensembl, $ref_arguments);
+	}
 
 	## find and annotate
 	my $ref_switch=_find_switch($ref_recurrent_major_tx, $ref_arguments);

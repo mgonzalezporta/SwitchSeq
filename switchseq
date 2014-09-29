@@ -21,6 +21,7 @@ $arguments{'threshold_breadth'}=50;
 $arguments{'threshold_dominance'}=1;
 $arguments{'tool'}="";
 $arguments{'filt'}="NA";
+$arguments{'custom_annot'}="FALSE";
 
 GetOptions(
 	\%arguments, 
@@ -28,6 +29,7 @@ GetOptions(
 	'tool|t=s',
     'data_dir|d:s',
     'species|s:s',
+    'custom_annot|a:s',
     'ensembl_v|e:i',
     'input|i=s',
     'out_dir|o=s',
