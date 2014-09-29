@@ -324,8 +324,9 @@ sub _obtain_switch_events {
 
 	## find and annotate
 	my $ref_switch=_find_switch($ref_recurrent_major_tx, $ref_arguments);
+	print Dumper %{$ref_switch};
 	$ref_switch=_annotate_switch($ref_switch, $ref_ensembl, $ref_appris, $ref_arguments);
-
+	print Dumper %{$ref_switch};
 	return $ref_switch;
 }
 
