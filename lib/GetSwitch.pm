@@ -317,7 +317,6 @@ sub _obtain_switch_events {
 	}
 
 	## check that genes/transcritps are coding in the provided annotation
-	print "custom annot: $custom_annot\n";
 	if ($custom_annot eq "FALSE") {
 		$ref_recurrent_major_tx = _filt_annotation($ref_recurrent_major_tx, $ref_ensembl, $ref_arguments);
 	}
