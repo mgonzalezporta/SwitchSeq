@@ -27,3 +27,13 @@ switchseq -t get_switch \
         -i ./data_test3/expdata.txt \
         -o ./html_test3 \
         -c1 3-7 -c2 8-12
+
+## test4: get_switch - 2+2 samples; UCSC annotation
+echo "Running test 4..."
+switchseq -t get_switch \
+        -s hsa -e 66 \
+	-a TRUE \
+        -d ./data_annot \
+        -i ./data_test4/expdata.txt \
+        -o ./html_test4 \
+        -c1 3-4 -c2 5-6
