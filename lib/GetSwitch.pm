@@ -324,10 +324,8 @@ sub _obtain_switch_events {
 
 	## find and annotate
 	my $ref_switch=_find_switch($ref_recurrent_major_tx, $ref_arguments);
-	
-	if ($custom_annot eq "FALSE") {
-		$ref_switch=_annotate_switch($ref_switch, $ref_ensembl, $ref_appris, $ref_arguments);
-	}
+	$ref_switch=_annotate_switch($ref_switch, $ref_ensembl, $ref_appris, $ref_arguments);
+
 	return $ref_switch;
 }
 
@@ -532,10 +530,12 @@ sub _annotate_switch {
 	my $ref_ensembl=$_[1];
 	my $ref_appris=$_[2];
 	my $ref_arguments=$_[3];
+	my $custom_annot=$ref_arguments->{'custom_annot'};
 
 	foreach my $gId (keys %$ref_switch) {
-		$ref_switch->{$gId}{'gName'}=$ref_ensembl->{$gId}{'gName'};
-		$ref_switch->{$gId}{'nOfT'}=$ref_ensembl->{$gId}{'nOfT'};
+		if ($custom_annot eq "FALSE") {
+			$ref_switch->{$gId}{'gName'}=$ref_ensembl->{$gId}{'gName'};
+			$ref_switch->{$gId}{'nOfT'}=$ref_ensembl->{$gId}{'nOfT'};
 	        $ref_switch->{$gId}{'C1.principal'}=_is_principal( $ref_switch->{$gId}{'C1.tId'}, $ref_appris );
 	        $ref_switch->{$gId}{'C2.principal'}=_is_principal( $ref_switch->{$gId}{'C2.tId'}, $ref_appris );
 	        $ref_switch->{$gId}{'C1.biotype'}=_get_tx_biotype( $gId, $ref_switch->{$gId}{'C1.tId'}, $ref_ensembl );
@@ -554,6 +554,17 @@ sub _annotate_switch {
 			            $ref_switch->{$gId}{'pdbEntry'}=$ref_ensembl->{$gId}{'uniprotId'};
 		            } 
 	        }
+        } else {
+			$ref_switch->{$gId}{'gName'}="NA";
+			$ref_switch->{$gId}{'nOfT'}="NA";
+	        $ref_switch->{$gId}{'C1.principal'}="NA";
+	        $ref_switch->{$gId}{'C2.principal'}="NA";
+	        $ref_switch->{$gId}{'C1.biotype'}="NA";
+	        $ref_switch->{$gId}{'C2.biotype'}="NA";
+			$ref_switch->{$gId}{'rank'}=_calculate_rank( $ref_switch->{$gId} );	 		
+	        $ref_switch->{$gId}{'pIdentity'}="NA";
+	    	$ref_switch->{$gId}{'pdbEntry'}="NA";
+        }
 	}	
 	return $ref_switch;
 }
