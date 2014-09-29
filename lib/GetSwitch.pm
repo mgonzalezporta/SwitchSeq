@@ -794,8 +794,8 @@ sub _print_html {
 		my $command="R CMD BATCH --no-save ".
 		  "\"--args bin='$Bin' gId='$gId' expdata='$expdata' filt='$filt' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
 		  "$Bin/scripts/generate_plots.R /dev/null";
-		# print $command."\n";
-		system($command);
+		print $command."\n";
+		# system($command);
 	}
 
 	foreach my $category (keys %count) {
