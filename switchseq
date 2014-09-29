@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# TODO: check custom_annot
+
 use strict;
 use warnings;
 use Getopt::Long;
