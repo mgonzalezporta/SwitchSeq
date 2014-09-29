@@ -47,7 +47,7 @@ sub get_switch {
 	}
 
 	my $ref_switch=_obtain_switch_events($ref_recurrent_major_tx, $ref_arguments);
-	print Dumper %$ref_switch;
+	# print Dumper %$ref_switch;
 
 	## print output
 	_print_txt($ref_switch, $ref_arguments);
@@ -794,7 +794,7 @@ sub _print_html {
 		my $command="R CMD BATCH --no-save ".
 		  "\"--args bin='$Bin' gId='$gId' expdata='$expdata' filt='$filt' annot='$annot' cond1='$cond1' cond2='$cond2' outdir='$out_dir'\" ". 
 		  "$Bin/scripts/generate_plots.R /dev/null";
-		print $command."\n";
+		# print $command."\n";
 		# system($command);
 	}
 

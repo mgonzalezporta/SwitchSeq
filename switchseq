@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 # TODO: check custom_annot
+# TODO: fix SwitchSeq with non-Ensembl annot
 
 use strict;
 use warnings;
