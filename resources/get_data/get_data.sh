@@ -51,7 +51,8 @@ esac
 if [ ! -z "$species_full" ]
 then
 	echo "Retrieving appris_data.principal.txt..."
-	appris=http://appris.bioinfo.cnio.es/download/data/$species_full/appris_data.principal.txt
+	Species_full=$(echo ${species_full:0:1} | tr '[a-z]' '[A-Z]')${species_full:1}
+	appris=http://appris.bioinfo.cnio.es/download/data/$species_full/$Species_full.GRCh37.appris_data.principal.txt
 	wget -P $outdir $appris 
 fi
 
