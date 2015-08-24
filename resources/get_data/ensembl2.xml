@@ -4,6 +4,6 @@
 <Dataset name = %name% interface = "default" >
         <Filter name = "biotype" value = "protein_coding"/>
         <Attribute name = "ensembl_gene_id" />
-        <Attribute name = "uniprot_swissprot_accession" />
+        <Attribute name = "uniprot_swissprot" />
 </Dataset>
 </Query>
