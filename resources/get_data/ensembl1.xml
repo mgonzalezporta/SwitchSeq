@@ -4,7 +4,7 @@
 <Dataset name = %name% interface = "default" >
 	<Filter name = "biotype" value = "protein_coding"/>
 	<Attribute name = "ensembl_gene_id" />
-	<Attribute name = "external_gene_id" />
+	<Attribute name = "external_gene_name" />
 	<Attribute name = "transcript_count" />
 	<Attribute name = "ensembl_transcript_id" />
 	<Attribute name = "transcript_biotype" />
